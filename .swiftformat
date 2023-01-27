@@ -1,0 +1,9 @@
+--extensionacl on-declarations
+--redundanttype explicit
+--swiftversion 5.7
+--maxwidth 120
+--header "{file}\nArgumentEncoding\n\nCopyright © {year} MFB Technologies, Inc. All rights reserved."
+--allman false
+--exclude **/output/**/*,.tuist-bin,**/.swiftpm/*,**/.build/*
+--wraparguments before-first
+--wrapcollections before-first
