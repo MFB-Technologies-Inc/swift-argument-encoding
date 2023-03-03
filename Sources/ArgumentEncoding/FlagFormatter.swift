@@ -8,22 +8,48 @@ import XCTestDynamicOverlay
 
 /// Formats `Flag`s to match how different executables format arguments
 public struct FlagFormatter {
-    private let format: (Flag) -> String
+    /// Formats a key string
+    public let format: (_ key: String) -> String
 
-    @inline(__always)
-    public func string(_ flag: Flag) -> String {
-        format(flag)
+    internal func _format(encoding: FlagEncoding) -> String {
+        format(encoding.key)
     }
 
-    public init(_ format: @escaping (Flag) -> String) {
+    /// Initialize a new formatter
+    ///
+    /// - Parameters
+    ///   - _ format: An escaping closure that takes the Flag's key value as input and returns a formatted String
+    public init(_ format: @escaping (_ key: String) -> String) {
         self.format = format
     }
 }
 
 extension FlagFormatter {
-    public static let singleDashPrefix = FlagFormatter { StaticString.singleDash.description + $0.key }
+    /// A formatter that prefixes flags with '-'
+    public static let singleDashPrefix = FlagFormatter { StaticString.singleDash.description + $0 }
 
-    public static let doubleDashPrefix = FlagFormatter { StaticString.doubleDash.description + $0.key }
+    /// A formatter that prefixes flags with '-' and converts from camelCase to kebab-case
+    public static let singleDashPrefixKebabCase = FlagFormatter { input in
+        StaticString.singleDash.description + CaseConverter.kebabCase(input)
+    }
+
+    /// A formatter that prefixes flags with '-' and converts from camelCase to snake_case
+    public static let singleDashPrefixSnakeCase = FlagFormatter { input in
+        StaticString.singleDash.description + CaseConverter.snakeCase(input)
+    }
+
+    /// A formatter that prefixes flags with '--'
+    public static let doubleDashPrefix = FlagFormatter { StaticString.doubleDash.description + $0 }
+
+    /// A formatter that prefixes flags with '--' and converts from camelCase to kebab-case
+    public static let doubleDashPrefixKebabCase = FlagFormatter { input in
+        StaticString.doubleDash.description + CaseConverter.kebabCase(input)
+    }
+
+    /// A formatter that prefixes flags with '--' and converts from camelCase to snake_case
+    public static let doubleDashPrefixSnakeCase = FlagFormatter { input in
+        StaticString.doubleDash.description + CaseConverter.snakeCase(input)
+    }
 }
 
 extension FlagFormatter: TestDependencyKey {
@@ -38,5 +64,5 @@ extension DependencyValues {
 }
 
 extension FlagFormatter {
-    public static let unimplemented = FlagFormatter(XCTestDynamicOverlay.unimplemented())
+    public static let unimplemented = FlagFormatter(XCTestDynamicOverlay.unimplemented(placeholder: "unimplemented"))
 }

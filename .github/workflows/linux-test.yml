@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '*'
+  workflow_dispatch:
+
+jobs:
+  library:
+    runs-on: ${{ matrix.os }}
+    environment: default
+    strategy:
+      matrix:
+        os: [ubuntu2004, ubuntu2204]
+    steps:
+      - name: Run Tests
+        run: swift test --enable-code-coverage --parallel

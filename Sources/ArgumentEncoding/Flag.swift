@@ -5,41 +5,103 @@
 
 import Dependencies
 
-public struct Flag: Sendable {
-    public let key: String
-    public var enabled: Bool
+/// Argument type that enables or disables a given feature. Flags never encode with a value like ``Option``.
+///
+///
+/// If a flag is not contained within an ``ArgumentGroup`` it needs an explicit `key` value. The explicit `key` value
+/// may be provided when initialized or when calling `arguments(key: String? = nil) -> [String]`.
+///
+/// ```swift
+/// let standAloneFlag = Flag("name", enabled: true)
+///
+/// standAloneFlag.arguments() == ["--name"]
+/// ```
+///
+/// Usually, a flag should be contained within a ``ArgumentGroup`` conforming type that will provide a `key` value.
+///
+/// ```swift
+/// struct FlagContainer: ArgumentGroup, FormatterNode {
+///     let flagFormatter: FlagFormatter = .doubleDashPrefix
+///     let optionFormatter: OptionFormatter = .doubleDashPrefix
+///
+///     @Flag var name: Bool = true
+/// }
+///
+/// FlagContainer().arguments() == ["--name"]
+/// ```
+@propertyWrapper
+public struct Flag: Sendable, Hashable {
+    /// Explicitly specify the key value
+    public let keyOverride: String?
+    public var wrappedValue: Bool
 
-    public func arguments() -> [String] {
-        if enabled {
-            return [formatter.string(self)]
-        } else {
-            return []
-        }
+    /// Is the flag enabled or disabled? If disabled, it will be omitted from the arguments output.
+    public var enabled: Bool {
+        wrappedValue
     }
 
-    @Dependency(\.flagFormatter) var formatter
-
-    public init(_ key: some CustomStringConvertible) {
-        self.key = key.description
-        enabled = true
-    }
-
-    public init?(_ key: some CustomStringConvertible, enabled: Bool?) {
-        guard let enabled, enabled else {
+    func encoding(key: String? = nil) -> FlagEncoding? {
+        guard let _key = keyOverride ?? key, enabled else {
             return nil
         }
-        self.init(key)
+        return FlagEncoding(key: _key)
+    }
+
+    /// Get the Flag's argument encoding. If `enabled == false`or `keyOverRide` and `key` are both `nil`, it will return
+    /// an empty array.
+    ///
+    /// - Parameters
+    ///     - key: Optionally provide a key value.
+    /// - Returns: The argument encoding which is an array of strings
+    public func arguments(key: String? = nil) -> [String] {
+        guard enabled, let encoding = encoding(key: key) else {
+            return []
+        }
+        return [encoding.argument()]
+    }
+
+    /// Initializes a new flag when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying enabled/disabled value
+    ///     - _ key: Optional explicit key value
+    public init(wrappedValue: Bool, _ key: String? = nil) {
+        keyOverride = key
+        self.wrappedValue = wrappedValue
+    }
+
+    /// Initializes a new flag when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - _ key: Optional explicit key value
+    ///     - enabled: The underlying enabled/disabled value
+    public init(_ key: some CustomStringConvertible, enabled: Bool = true) {
+        keyOverride = key.description
+        wrappedValue = enabled
     }
 }
 
-extension Flag: ExpressibleByStringLiteral {
-    public init(stringLiteral value: StringLiteralType) {
-        self.init(value)
+// MARK: ExpressibleByBooleanLiteral conformance
+
+extension Flag: ExpressibleByBooleanLiteral {
+    public init(booleanLiteral value: BooleanLiteralType) {
+        self.init(wrappedValue: value)
     }
 }
 
-extension Flag: ExpressibleByStringInterpolation {
-    public init(stringInterpolation: DefaultStringInterpolation) {
-        self.init(stringInterpolation)
+// MARK: Internal Types
+
+/*
+ Dependencies library is used for injecting the formatters. FlagEncoding is
+ initialized within a `withDependencies` closure so that the formatter is
+ correctly injected.
+ */
+struct FlagEncoding {
+    @Dependency(\.flagFormatter) var formatter
+
+    let key: String
+
+    func argument() -> String {
+        formatter._format(encoding: self)
     }
 }
