@@ -11,10 +11,7 @@ on:
 
 jobs:
   library:
-    strategy:
-      matrix:
-        os: [ubuntu2004, ubuntu2204]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     environment: default
     
     steps:
