@@ -15,5 +15,6 @@ jobs:
     environment: default
     
     steps:
+      - uses: actions/checkout@v3
       - name: Run Tests
         run: swift test --enable-code-coverage --parallel
