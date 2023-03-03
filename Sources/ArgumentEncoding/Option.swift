@@ -324,7 +324,8 @@ struct OptionEncoding {
 }
 
 /*
- Since Option is generic, we need a single type to cast to in ArgumentGroup. OptionProtocol is that type and Option is the only type that conforms.
+ Since Option is generic, we need a single type to cast to in ArgumentGroup.
+ OptionProtocol is that type and Option is the only type that conforms.
  */
 protocol OptionProtocol {
     func arguments(key: String?) -> [String]
