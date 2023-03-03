@@ -3,11 +3,16 @@
 //
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
 
+/// A command type argument with no nested or children arguments.
 public struct Command: Hashable, Sendable, RawRepresentable {
     public let rawValue: String
 
+    /// Accessor for `self` encoded as an array of argument strings - `[self.rawValue]`
     public func arguments() -> [String] {
-        [rawValue]
+        guard !rawValue.isEmpty else {
+            return []
+        }
+        return [rawValue]
     }
 
     public init(rawValue: String) {
@@ -15,6 +20,7 @@ public struct Command: Hashable, Sendable, RawRepresentable {
     }
 }
 
+// ExpressibleBy...Literal conformances
 extension Command: ExpressibleByStringLiteral {
     public init(stringLiteral value: StringLiteralType) {
         self.init(rawValue: value)

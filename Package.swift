@@ -4,7 +4,7 @@ import PackageDescription
 
 let package = Package(
     name: "swift-argument-encoding",
-    platforms: [.macOS(.v10_15)],
+    platforms: [.macOS(.v12)],
     products: [
         .library(name: "ArgumentEncoding", targets: ["ArgumentEncoding"]),
     ],
