@@ -11,11 +11,12 @@ on:
 
 jobs:
   library:
-    runs-on: ${{ matrix.os }}
-    environment: default
     strategy:
       matrix:
         os: [ubuntu2004, ubuntu2204]
+    runs-on: ${{ matrix.os }}
+    environment: default
+    
     steps:
       - name: Run Tests
         run: swift test --enable-code-coverage --parallel
