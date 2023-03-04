@@ -1,5 +1,7 @@
 # ArgumentEncoding
 
+[![codecov](https://codecov.io/gh/MFB-Technologies-Inc/swift-argument-encoding/branch/main/graph/badge.svg?token=UU95IDUXAX)](https://codecov.io/gh/MFB-Technologies-Inc/swift-argument-encoding)
+
 A library for encoding types into an Array of Strings, or 'arguments'.
 
 ## Stability
