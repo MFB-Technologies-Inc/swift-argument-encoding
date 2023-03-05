@@ -7,9 +7,9 @@ import ArgumentEncoding
 import XCTest
 
 final class CommandRepresentableTests: XCTestCase {
-    private struct Container<T>: ArgumentGroup where T: CommandRepresentable {
-        static var flagFormatter: FlagFormatter { .doubleDashPrefix }
-        static var optionFormatter: OptionFormatter { .doubleDashPrefix }
+    private struct Container<T>: ArgumentGroup, FormatterNode where T: CommandRepresentable {
+        var flagFormatter: FlagFormatter { .doubleDashPrefix }
+        var optionFormatter: OptionFormatter { .doubleDashPrefix }
 
         var command: T
 
@@ -18,7 +18,7 @@ final class CommandRepresentableTests: XCTestCase {
         }
     }
 
-    private struct EmptyCommand: CommandRepresentable {
+    private struct EmptyCommand: CommandRepresentable, FormatterNode {
         let flagFormatter: FlagFormatter = .doubleDashPrefix
         let optionFormatter: OptionFormatter = .doubleDashPrefix
     }
@@ -29,7 +29,7 @@ final class CommandRepresentableTests: XCTestCase {
         XCTAssertEqual(args, ["command"])
     }
 
-    private struct CommandGroup: CommandRepresentable {
+    private struct CommandGroup: CommandRepresentable, FormatterNode {
         let flagFormatter: FlagFormatter = .doubleDashPrefix
         let optionFormatter: OptionFormatter = .doubleDashPrefix
 
@@ -67,7 +67,7 @@ final class CommandRepresentableTests: XCTestCase {
         )
     }
 
-    private struct ParentCommand: CommandRepresentable {
+    private struct ParentCommand: CommandRepresentable, FormatterNode {
         let flagFormatter: FlagFormatter = .doubleDashPrefix
         let optionFormatter: OptionFormatter = .doubleDashPrefix
 
@@ -82,7 +82,7 @@ final class CommandRepresentableTests: XCTestCase {
         }
     }
 
-    private struct ChildCommand: CommandRepresentable {
+    private struct ChildCommand: CommandRepresentable, FormatterNode {
         let flagFormatter: FlagFormatter = .singleDashPrefix
         let optionFormatter: OptionFormatter = .singleDashPrefix
 
@@ -130,7 +130,7 @@ final class CommandRepresentableTests: XCTestCase {
         )
     }
 
-    private enum ParentEnumCommand: CommandRepresentable {
+    private enum ParentEnumCommand: CommandRepresentable, FormatterNode {
         var flagFormatter: FlagFormatter { .singleDashPrefix }
         var optionFormatter: OptionFormatter { .singleDashPrefix }
 

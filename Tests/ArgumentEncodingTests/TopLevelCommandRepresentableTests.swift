@@ -73,7 +73,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
             self.child = child
         }
 
-        struct ChildCommand: CommandRepresentable {
+        struct ChildCommand: CommandRepresentable, FormatterNode {
             func commandValue() -> Command { "child" }
             let flagFormatter: FlagFormatter = .singleDashPrefix
             let optionFormatter: OptionFormatter = .singleDashPrefix
