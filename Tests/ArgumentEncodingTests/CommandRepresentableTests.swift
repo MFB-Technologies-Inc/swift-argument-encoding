@@ -94,9 +94,13 @@ final class CommandRepresentableTests: XCTestCase {
             self.buildTests = buildTests
         }
 
-        enum Configuration: String {
+        enum Configuration: String, CustomStringConvertible {
             case arm64
             case x86_64
+
+            var description: String {
+                rawValue
+            }
         }
     }
 

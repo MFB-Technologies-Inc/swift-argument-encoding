@@ -127,32 +127,6 @@ extension Option where Value: CustomStringConvertible {
     }
 }
 
-// MARK: Convenience initializers when Value: RawRepresentable and Value.RawValue == String
-
-extension Option where Value: RawRepresentable, Value.RawValue == String {
-    /// Initializes a new option when not used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - key: Explicit key value
-    ///     - wrappedValue: The underlying value
-    public init(key: some CustomStringConvertible, value: Value) {
-        keyOverride = key.description
-        wrappedValue = value
-        unwrap = { [$0.rawValue] }
-    }
-
-    /// Initializes a new option when used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - wrappedValue: The underlying value
-    ///     - _ key: Optional explicit key value
-    public init(wrappedValue: Value, _ key: String? = nil) {
-        keyOverride = key
-        self.wrappedValue = wrappedValue
-        unwrap = { [$0.rawValue] }
-    }
-}
-
 // MARK: Convenience initializers when Value == Optional<Wrapped>
 
 extension Option {
@@ -180,32 +154,6 @@ extension Option {
         keyOverride = key
         self.wrappedValue = wrappedValue
         unwrap = { [$0?.description].compactMap { $0 } }
-    }
-
-    /// Initializes a new option when not used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - key: Explicit key value
-    ///     - wrappedValue: The underlying value
-    public init<Wrapped>(key: some CustomStringConvertible, value: Wrapped?) where Wrapped: RawRepresentable,
-        Wrapped.RawValue == String, Value == Wrapped?
-    {
-        keyOverride = key.description
-        wrappedValue = value
-        unwrap = { [$0?.rawValue].compactMap { $0 } }
-    }
-
-    /// Initializes a new option when used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - wrappedValue: The underlying value
-    ///     - _ key: Optional explicit key value
-    public init<Wrapped>(wrappedValue: Wrapped?, _ key: String? = nil) where Wrapped: RawRepresentable,
-        Wrapped.RawValue == String, Value == Wrapped?
-    {
-        keyOverride = key
-        self.wrappedValue = wrappedValue
-        unwrap = { [$0?.rawValue].compactMap { $0 } }
     }
 }
 
@@ -236,32 +184,6 @@ extension Option {
         keyOverride = key
         self.wrappedValue = wrappedValue
         unwrap = { $0.map(\E.description) }
-    }
-
-    /// Initializes a new option when not used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - key: Explicit key value
-    ///     - wrappedValue: The underlying value
-    public init<E>(key: some CustomStringConvertible, values: Value) where Value: Sequence, Value.Element == E,
-        E: RawRepresentable, E.RawValue == String
-    {
-        keyOverride = key.description
-        wrappedValue = values
-        unwrap = { $0.map(\E.rawValue) }
-    }
-
-    /// Initializes a new option when used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - wrappedValue: The underlying value
-    ///     - _ key: Optional explicit key value
-    public init<E>(wrappedValue: Value, _ key: String? = nil) where Value: Sequence, Value.Element == E,
-        E: RawRepresentable, E.RawValue == String
-    {
-        keyOverride = key
-        self.wrappedValue = wrappedValue
-        unwrap = { $0.map(\E.rawValue) }
     }
 }
 
