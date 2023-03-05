@@ -35,8 +35,8 @@ import Dependencies
 /// let arguments = container.arguments()
 /// ```
 ///
-/// `CommandRepresentable` inherits from ``ArgumentGroup`` and ``FormatterNode``
-public protocol CommandRepresentable: ArgumentGroup, FormatterNode {}
+/// `CommandRepresentable` inherits from ``ArgumentGroup``
+public protocol CommandRepresentable: ArgumentGroup {}
 
 extension CommandRepresentable {
     /// Prefixes the child arguments with an explicit command value.

@@ -34,7 +34,7 @@
 /// ```
 ///
 /// `TopLevelCommandRepresentable` inherits from ``ArgumentGroup``, ``FormatterNode``, and ``CommandRepresentable``
-public protocol TopLevelCommandRepresentable: CommandRepresentable {
+public protocol TopLevelCommandRepresentable: CommandRepresentable, FormatterNode {
     func commandValue() -> Command
 }
 
