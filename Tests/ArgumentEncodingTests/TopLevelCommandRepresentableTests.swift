@@ -73,7 +73,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
             self.child = child
         }
 
-        struct ChildCommand: CommandRepresentable {
+        struct ChildCommand: CommandRepresentable, FormatterNode {
             func commandValue() -> Command { "child" }
             let flagFormatter: FlagFormatter = .singleDashPrefix
             let optionFormatter: OptionFormatter = .singleDashPrefix
@@ -86,9 +86,11 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
                 self.buildTests = buildTests
             }
 
-            enum Configuration: String {
+            enum Configuration: String, CustomStringConvertible {
                 case arm64
                 case x86_64
+
+                var description: String { rawValue }
             }
         }
     }
@@ -142,9 +144,11 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
             self.buildTests = buildTests
         }
 
-        enum Configuration: String {
+        enum Configuration: String, CustomStringConvertible {
             case arm64
             case x86_64
+
+            var description: String { rawValue }
         }
     }
 
