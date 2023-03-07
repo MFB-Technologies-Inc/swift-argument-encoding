@@ -2,6 +2,8 @@
 
 [![ci](https://github.com/MFB-Technologies-Inc/swift-argument-encoding/actions/workflows/ci.yml/badge.svg)](https://github.com/MFB-Technologies-Inc/swift-argument-encoding/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/MFB-Technologies-Inc/swift-argument-encoding/branch/main/graph/badge.svg?token=UU95IDUXAX)](https://codecov.io/gh/MFB-Technologies-Inc/swift-argument-encoding)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FMFB-Technologies-Inc%2Fswift-argument-encoding%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/MFB-Technologies-Inc/swift-argument-encoding)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FMFB-Technologies-Inc%2Fswift-argument-encoding%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/MFB-Technologies-Inc/swift-argument-encoding)
 
 A library for encoding types into an Array of Strings, or 'arguments'.
 
