@@ -89,6 +89,24 @@ extension Flag: ExpressibleByBooleanLiteral {
     }
 }
 
+// MARK: Decodable Conformance
+
+extension Flag: Decodable {
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        try self.init(wrappedValue: container.decode(Bool.self))
+    }
+}
+
+// MARK: Encodable Conformance
+
+extension Flag: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(wrappedValue)
+    }
+}
+
 // MARK: Internal Types
 
 /*
