@@ -230,7 +230,7 @@ extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
 extension Option: Decodable where Value: Decodable & CustomStringConvertible {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        self.init(wrappedValue: try container.decode(Value.self))
+        try self.init(wrappedValue: container.decode(Value.self))
     }
 }
 
