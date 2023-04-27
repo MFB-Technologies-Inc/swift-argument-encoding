@@ -11,12 +11,8 @@ on:
 
 jobs:
   lint:
-    runs-on: macos-12
+    runs-on: macos-13
     environment: default
-    strategy:
-      matrix:
-        xcode: ['14.2']
-        # Swift: 5.7  
     steps:
       - uses: actions/checkout@v3
       - name: Format lint
@@ -24,12 +20,12 @@ jobs:
       - name: Lint
         run: swiftlint .
   macos-test:
-    runs-on: macos-12
+    runs-on: macos-13
     environment: default
     strategy:
       matrix:
-        xcode: ['14.2']
-        # Swift: 5.7  
+        xcode: ['14.2', '14.3']
+        # Swift: 5.7  , 5.8
     steps:
       - uses: actions/checkout@v3
       - name: Select Xcode ${{ matrix.xcode }}
