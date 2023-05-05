@@ -132,6 +132,66 @@ extension Option where Value: CustomStringConvertible {
     }
 }
 
+extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConvertible {
+    /// Initializes a new option when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - key: Explicit key value
+    ///     - wrappedValue: The underlying value
+    public init(key: some CustomStringConvertible, value: Value) {
+        keyOverride = key.description
+        wrappedValue = value
+        unwrap = Self.unwrap(_:)
+    }
+
+    /// Initializes a new option when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    ///     - _ key: Optional explicit key value
+    public init(wrappedValue: Value, _ key: String? = nil) {
+        keyOverride = key
+        self.wrappedValue = wrappedValue
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.rawValue.description]
+    }
+}
+
+extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
+    Value.RawValue: CustomStringConvertible
+{
+    /// Initializes a new option when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - key: Explicit key value
+    ///     - wrappedValue: The underlying value
+    public init(key: some CustomStringConvertible, value: Value) {
+        keyOverride = key.description
+        wrappedValue = value
+        unwrap = Self.unwrap(_:)
+    }
+
+    /// Initializes a new option when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    ///     - _ key: Optional explicit key value
+    public init(wrappedValue: Value, _ key: String? = nil) {
+        keyOverride = key
+        self.wrappedValue = wrappedValue
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.rawValue.description]
+    }
+}
+
 // MARK: Convenience initializers when Value == Optional<Wrapped>
 
 extension Option {
