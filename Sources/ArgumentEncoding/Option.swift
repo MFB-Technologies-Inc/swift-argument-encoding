@@ -112,7 +112,7 @@ extension Option where Value: CustomStringConvertible {
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
-        unwrap = { [$0.description] }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -123,7 +123,12 @@ extension Option where Value: CustomStringConvertible {
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { [$0.description] }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.description]
     }
 }
 
@@ -140,7 +145,7 @@ extension Option {
     {
         keyOverride = key.description
         wrappedValue = value
-        unwrap = { [$0?.description].compactMap { $0 } }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -153,7 +158,14 @@ extension Option {
     {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { [$0?.description].compactMap { $0 } }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap<Wrapped>(_ value: Wrapped?) -> [String] where Wrapped: CustomStringConvertible,
+        Value == Wrapped?
+    {
+        [value?.description].compactMap { $0 }
     }
 }
 
@@ -170,7 +182,7 @@ extension Option {
     {
         keyOverride = key.description
         wrappedValue = values
-        unwrap = { $0.map(\E.description) }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -183,7 +195,14 @@ extension Option {
     {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { $0.map(\E.description) }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap<E>(_ value: Value) -> [String] where Value: Sequence, Value.Element == E,
+        E: CustomStringConvertible
+    {
+        value.map(\E.description)
     }
 }
 
