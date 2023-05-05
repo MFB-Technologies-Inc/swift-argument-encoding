@@ -17,4 +17,40 @@ final class OptionTests: XCTestCase {
         }
         XCTAssertEqual(args, ["--configuration", "release"])
     }
+
+    func testBothRawValueAndStringConvertible() throws {
+        let option = Option(key: "configuration", value: RawValueCustomStringConvertible(rawValue: "release"))
+        let args = withDependencies { values in
+            values.optionFormatter = .doubleDashPrefix
+        } operation: {
+            option.arguments()
+        }
+        XCTAssertEqual(args, ["--configuration", "release"])
+    }
+
+    func testBothRawValueAndStringConvertibleContainer() throws {
+        let container = Container(configuration: RawValueCustomStringConvertible(rawValue: "release"))
+        let args = withDependencies { values in
+            values.optionFormatter = .doubleDashPrefix
+        } operation: {
+            container.arguments()
+        }
+        XCTAssertEqual(args, ["--configuration", "release"])
+    }
+}
+
+private struct RawValueCustomStringConvertible: RawRepresentable, CustomStringConvertible {
+    var rawValue: String
+
+    var description: String {
+        "description=" + rawValue
+    }
+}
+
+private struct Container: ArgumentGroup {
+    @Option var configuration: RawValueCustomStringConvertible
+
+    init(configuration: RawValueCustomStringConvertible) {
+        _configuration = Option(wrappedValue: configuration)
+    }
 }
