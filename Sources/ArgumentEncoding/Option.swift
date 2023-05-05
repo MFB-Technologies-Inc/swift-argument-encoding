@@ -4,6 +4,7 @@
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
 
 import Dependencies
+import Foundation
 
 /// A key/value pair argument that provides a given value for a option or variable.
 ///
@@ -303,6 +304,13 @@ extension Option: ExpressibleByStringLiteral where Value: StringProtocol {
 extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
     public init(stringInterpolation: DefaultStringInterpolation) {
         self.init(wrappedValue: Value(stringInterpolation: stringInterpolation))
+    }
+}
+
+extension Option: DecodableWithConfiguration where Value: Decodable {
+    public init(from decoder: Decoder, configuration: @escaping @Sendable (Value) -> [String]) throws {
+        let container = try decoder.singleValueContainer()
+        try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
     }
 }
 
