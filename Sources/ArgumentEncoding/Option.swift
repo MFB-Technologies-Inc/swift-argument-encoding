@@ -306,10 +306,36 @@ extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
     }
 }
 
-extension Option: Decodable where Value: Decodable & CustomStringConvertible {
+extension Option: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        try self.init(wrappedValue: container.decode(Value.self))
+        guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey(for: Value.Type.self) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "No CodingUserInfoKey found for accessing the DecodingConfiguration.",
+                underlyingError: nil
+            ))
+        }
+        guard let _configuration = decoder.userInfo[configurationCodingUserInfoKey] else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "No DecodingConfiguration found for key: \(configurationCodingUserInfoKey.rawValue)",
+                underlyingError: nil
+            ))
+        }
+        guard let configuration = _configuration as? Self.DecodingConfiguration else {
+            let desc = "Invalid DecodingConfiguration found for key: \(configurationCodingUserInfoKey.rawValue)"
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: desc,
+                underlyingError: nil
+            ))
+        }
+        try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
+    }
+
+    public static func configurationCodingUserInfoKey(for _: (some Any).Type) -> CodingUserInfoKey? {
+        CodingUserInfoKey(rawValue: ObjectIdentifier(Self.self).debugDescription)
     }
 }
 
