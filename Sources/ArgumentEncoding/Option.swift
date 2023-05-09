@@ -4,6 +4,7 @@
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
 
 import Dependencies
+import Foundation
 
 /// A key/value pair argument that provides a given value for a option or variable.
 ///
@@ -112,7 +113,7 @@ extension Option where Value: CustomStringConvertible {
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
-        unwrap = { [$0.description] }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -123,7 +124,72 @@ extension Option where Value: CustomStringConvertible {
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { [$0.description] }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.description]
+    }
+}
+
+extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConvertible {
+    /// Initializes a new option when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - key: Explicit key value
+    ///     - wrappedValue: The underlying value
+    public init(key: some CustomStringConvertible, value: Value) {
+        keyOverride = key.description
+        wrappedValue = value
+        unwrap = Self.unwrap(_:)
+    }
+
+    /// Initializes a new option when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    ///     - _ key: Optional explicit key value
+    public init(wrappedValue: Value, _ key: String? = nil) {
+        keyOverride = key
+        self.wrappedValue = wrappedValue
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.rawValue.description]
+    }
+}
+
+extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
+    Value.RawValue: CustomStringConvertible
+{
+    /// Initializes a new option when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - key: Explicit key value
+    ///     - wrappedValue: The underlying value
+    public init(key: some CustomStringConvertible, value: Value) {
+        keyOverride = key.description
+        wrappedValue = value
+        unwrap = Self.unwrap(_:)
+    }
+
+    /// Initializes a new option when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    ///     - _ key: Optional explicit key value
+    public init(wrappedValue: Value, _ key: String? = nil) {
+        keyOverride = key
+        self.wrappedValue = wrappedValue
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        [value.rawValue.description]
     }
 }
 
@@ -140,7 +206,7 @@ extension Option {
     {
         keyOverride = key.description
         wrappedValue = value
-        unwrap = { [$0?.description].compactMap { $0 } }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -153,7 +219,14 @@ extension Option {
     {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { [$0?.description].compactMap { $0 } }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap<Wrapped>(_ value: Wrapped?) -> [String] where Wrapped: CustomStringConvertible,
+        Value == Wrapped?
+    {
+        [value?.description].compactMap { $0 }
     }
 }
 
@@ -170,7 +243,7 @@ extension Option {
     {
         keyOverride = key.description
         wrappedValue = values
-        unwrap = { $0.map(\E.description) }
+        unwrap = Self.unwrap(_:)
     }
 
     /// Initializes a new option when used as a `@propertyWrapper`
@@ -183,7 +256,14 @@ extension Option {
     {
         keyOverride = key
         self.wrappedValue = wrappedValue
-        unwrap = { $0.map(\E.description) }
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap<E>(_ value: Value) -> [String] where Value: Sequence, Value.Element == E,
+        E: CustomStringConvertible
+    {
+        value.map(\E.description)
     }
 }
 
@@ -227,10 +307,43 @@ extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
     }
 }
 
-extension Option: Decodable where Value: Decodable & CustomStringConvertible {
+extension Option: DecodableWithConfiguration where Value: Decodable {
+    public init(from decoder: Decoder, configuration: @escaping @Sendable (Value) -> [String]) throws {
+        let container = try decoder.singleValueContainer()
+        try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
+    }
+}
+
+extension Option: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        try self.init(wrappedValue: container.decode(Value.self))
+        guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey(for: Value.Type.self) else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "No CodingUserInfoKey found for accessing the DecodingConfiguration.",
+                underlyingError: nil
+            ))
+        }
+        guard let _configuration = decoder.userInfo[configurationCodingUserInfoKey] else {
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: "No DecodingConfiguration found for key: \(configurationCodingUserInfoKey.rawValue)",
+                underlyingError: nil
+            ))
+        }
+        guard let configuration = _configuration as? Self.DecodingConfiguration else {
+            let desc = "Invalid DecodingConfiguration found for key: \(configurationCodingUserInfoKey.rawValue)"
+            throw DecodingError.dataCorrupted(DecodingError.Context(
+                codingPath: decoder.codingPath,
+                debugDescription: desc,
+                underlyingError: nil
+            ))
+        }
+        try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
+    }
+
+    public static func configurationCodingUserInfoKey(for _: (some Any).Type) -> CodingUserInfoKey? {
+        CodingUserInfoKey(rawValue: ObjectIdentifier(Self.self).debugDescription)
     }
 }
 

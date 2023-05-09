@@ -36,6 +36,7 @@ jobs:
         run: xcrun llvm-cov export -format="lcov" .build/debug/swift-argument-encodingPackageTests.xctest/Contents/MacOS/swift-argument-encodingPackageTests -instr-profile .build/debug/codecov/default.profdata > coverage_report.lcov
       - uses: codecov/codecov-action@v3
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true # optional (default = false)
   linux-test:
     runs-on: ubuntu-latest
