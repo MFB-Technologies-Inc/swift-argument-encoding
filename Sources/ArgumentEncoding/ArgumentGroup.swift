@@ -112,6 +112,8 @@ extension ArgumentGroup {
             return .commandRep(commandRep)
         } else if let group = value as? (any ArgumentGroup) {
             return .group(group)
+        } else if let positional = value as? PositionalProtocol {
+            return .positional(positional)
         } else {
             return nil
         }
@@ -140,6 +142,8 @@ extension ArgumentGroup {
                 }
             case let .group(group):
                 return group.arguments()
+            case let .positional(positional):
+                return positional.arguments()
             }
         })
     }
@@ -260,4 +264,5 @@ private enum Container {
     case topLevelCommandRep(any TopLevelCommandRepresentable)
     case commandRep(any CommandRepresentable)
     case group(any ArgumentGroup)
+    case positional(any PositionalProtocol)
 }

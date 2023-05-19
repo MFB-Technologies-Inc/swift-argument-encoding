@@ -51,6 +51,21 @@ struct MyCommand: TopLevelCommandRepresentable {
 }
 ```
 
+Positional arguments that are just a value, with no key are supported through the `Positional` type.
+
+```swift
+struct MyCommand: TopLevelCommandRepresentable {
+    func commandValue() -> Command { "my-command" }
+    var flagFormatter: FlagFormatter { .doubleDashPrefix }
+    var optionFormatter: OptionFormatter { .doubleDashPrefix }
+
+    @Flag var myFlag: Bool = false
+    @Option var myOption: Int = 0
+    @OptionSet var myOptions: [String] = ["value1", "value2"]
+    @Positional var myPositional: String = "positional"
+}
+```
+
 ## Motivation
 
 When running executables with Swift, it may be helpful to encode structured types (struct, class, enum) into argument arrays that are passed to executables.
@@ -126,12 +141,12 @@ struct RunCommand: CommandRepresentable {
     let flagFormatter: FlagFormatter = .doubleDashPrefixKebabCase
     let optionFormatter: OptionFormatter = .doubleDashPrefixKebabCase
 
-    let executable: Command
+    @Positional var executable: String
 }
 
 extension RunCommand: ExpressibleByStringLiteral {
     init(stringLiteral value: StringLiteralType) {
-        self.init(executable: Command(rawValue: value))
+        self.init(executable: Positional(wrapped: value))
     }
 }
 

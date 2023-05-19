@@ -23,10 +23,12 @@ final class ArgumentGroupTests: XCTestCase {
 
         @Flag var asyncMain: Bool
         @Option var numThreads: Int = 0
+        @Positional var target: String
 
-        init(asyncMain: Bool, numThreads: Int) {
+        init(asyncMain: Bool, numThreads: Int, target: String) {
             self.asyncMain = asyncMain
             self.numThreads = numThreads
+            _target = Positional(value: target)
         }
     }
 
@@ -34,17 +36,19 @@ final class ArgumentGroupTests: XCTestCase {
         XCTAssertEqual(
             Group(
                 asyncMain: false,
-                numThreads: 2
+                numThreads: 2,
+                target: "target"
             ).arguments(),
-            ["--numThreads", "2"]
+            ["--numThreads", "2", "target"]
         )
 
         XCTAssertEqual(
             Group(
                 asyncMain: true,
-                numThreads: 0
+                numThreads: 0,
+                target: "target"
             ).arguments(),
-            ["--asyncMain", "--numThreads", "0"]
+            ["--asyncMain", "--numThreads", "0", "target"]
         )
     }
 
@@ -54,11 +58,13 @@ final class ArgumentGroupTests: XCTestCase {
 
         @Flag var asyncMain: Bool
         @Option var numThreads: Int = 0
+        @Positional var target: String
         var child: ChildGroup
 
-        init(asyncMain: Bool, numThreads: Int, child: ChildGroup) {
+        init(asyncMain: Bool, numThreads: Int, target: String, child: ChildGroup) {
             self.asyncMain = asyncMain
             self.numThreads = numThreads
+            _target = Positional(value: target)
             self.child = child
         }
     }
@@ -69,10 +75,12 @@ final class ArgumentGroupTests: XCTestCase {
 
         @Option var configuration: Configuration = .arm64
         @Flag var buildTests: Bool
+        @Positional var target: String
 
-        init(configuration: Configuration, buildTests: Bool) {
+        init(configuration: Configuration, buildTests: Bool, target: String) {
             self.configuration = configuration
             self.buildTests = buildTests
+            _target = Positional(value: target)
         }
 
         enum Configuration: String, CustomStringConvertible {
@@ -88,24 +96,28 @@ final class ArgumentGroupTests: XCTestCase {
             ParentGroup(
                 asyncMain: false,
                 numThreads: 2,
+                target: "target",
                 child: ChildGroup(
                     configuration: .arm64,
-                    buildTests: false
+                    buildTests: false,
+                    target: "target"
                 )
             ).arguments(),
-            ["--numThreads", "2", "-configuration", "arm64"]
+            ["--numThreads", "2", "target", "-configuration", "arm64", "target"]
         )
 
         XCTAssertEqual(
             ParentGroup(
                 asyncMain: true,
                 numThreads: 1,
+                target: "target",
                 child: ChildGroup(
                     configuration: .x86_64,
-                    buildTests: true
+                    buildTests: true,
+                    target: "target"
                 )
             ).arguments(),
-            ["--asyncMain", "--numThreads", "1", "-configuration", "x86_64", "-buildTests"]
+            ["--asyncMain", "--numThreads", "1", "target", "-configuration", "x86_64", "-buildTests", "target"]
         )
     }
 
