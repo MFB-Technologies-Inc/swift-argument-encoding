@@ -37,7 +37,7 @@ struct MyCommand: TopLevelCommandRepresentable {
 }
 ```
 
-In addition to modeling the ability to enable/disable a feature, we need to set a value against some variable. For this, we can use `Option`.
+In addition to modeling the ability to enable/disable a feature, we need to set a value against some variable. For this, we can use `Option`. For options that can have multiple values, there is `OptionSet`.
 
 ```swift
 struct MyCommand: TopLevelCommandRepresentable {
@@ -47,6 +47,7 @@ struct MyCommand: TopLevelCommandRepresentable {
 
     @Flag var myFlag: Bool = false
     @Option var myOption: Int = 0
+    @OptionSet var myOptions: [String] = ["value1", "value2"]
 }
 ```
 
@@ -141,8 +142,6 @@ struct TestCommand: CommandRepresentable {
     @Flag var parallel: Bool = true
     @Option var numWorkers: Int = 1
     @Flag var showCodecovPath: Bool = false
-    var testProducts: [Command]
+    @OptionSet var testProducts: [String] = []
 }
-
-extension [Command]: ArgumentGroup {}
 ```

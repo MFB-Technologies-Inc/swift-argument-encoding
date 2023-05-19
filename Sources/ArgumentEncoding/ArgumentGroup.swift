@@ -100,6 +100,8 @@ extension ArgumentGroup {
             return container
         } else if let option = value as? OptionProtocol {
             return .option(option)
+        } else if let optionSet = value as? OptionSetProtocol {
+            return .optionSet(optionSet)
         } else if let flag = value as? Flag {
             return .flag(flag)
         } else if let command = value as? Command {
@@ -122,6 +124,8 @@ extension ArgumentGroup {
             switch value {
             case let .option(option):
                 return option.arguments(key: label)
+            case let .optionSet(optionSet):
+                return optionSet.arguments(key: label)
             case let .flag(flag):
                 return flag.arguments(key: label)
             case let .command(command):
@@ -250,6 +254,7 @@ extension ArgumentGroup {
 // Represents the possible underlying argument types
 private enum Container {
     case option(any OptionProtocol)
+    case optionSet(any OptionSetProtocol)
     case flag(Flag)
     case command(Command)
     case topLevelCommandRep(any TopLevelCommandRepresentable)
