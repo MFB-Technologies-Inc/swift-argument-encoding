@@ -27,7 +27,7 @@ import Foundation
 ///     @Option var name: String = "value"
 /// }
 ///
-/// OptionContainer().arguments() == ["--name", "value"]
+/// Container().arguments() == ["--name", "value"]
 /// ```
 @propertyWrapper
 public struct Option<Value>: OptionProtocol {
