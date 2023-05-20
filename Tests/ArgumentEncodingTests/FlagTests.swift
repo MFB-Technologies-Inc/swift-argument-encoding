@@ -11,7 +11,7 @@ final class FlagTests: XCTestCase {
     func testFlagImplicitEnabled() throws {
         let flag = Flag("verbose")
         let args = withDependencies { values in
-            values.flagFormatter = .doubleDashPrefix
+            values.flagFormatter = FlagFormatter(prefix: .doubleDash)
         } operation: {
             flag.arguments()
         }
@@ -21,7 +21,7 @@ final class FlagTests: XCTestCase {
     func testFlagExplicitEnabled() throws {
         let flag = Flag("verbose", enabled: true)
         let args = withDependencies { values in
-            values.flagFormatter = .doubleDashPrefix
+            values.flagFormatter = FlagFormatter(prefix: .doubleDash)
         } operation: {
             flag.arguments()
         }

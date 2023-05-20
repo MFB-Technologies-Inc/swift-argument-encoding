@@ -9,8 +9,8 @@ import XCTest
 final class TopLevelCommandRepresentableTests: XCTestCase {
     private struct EmptyCommand: TopLevelCommandRepresentable {
         func commandValue() -> Command { "swift" }
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
     }
 
     func testEmptyCommand() throws {
@@ -21,8 +21,8 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
 
     private struct CommandGroup: TopLevelCommandRepresentable {
         func commandValue() -> Command { "swift" }
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
 
         @Flag var verbose: Bool
         @Option var product: String? = nil
@@ -41,8 +41,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
             ).arguments(),
             [
                 "swift",
-                "--product",
-                "Target",
+                "--product Target",
             ]
         )
 
@@ -60,8 +59,8 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
 
     private struct ParentCommand: TopLevelCommandRepresentable {
         func commandValue() -> Command { "parent" }
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
 
         @Flag var verbose: Bool
         @Option var product: String? = nil
@@ -75,8 +74,8 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
 
         struct ChildCommand: CommandRepresentable, FormatterNode {
             func commandValue() -> Command { "child" }
-            let flagFormatter: FlagFormatter = .singleDashPrefix
-            let optionFormatter: OptionFormatter = .singleDashPrefix
+            let flagFormatter: FlagFormatter = .init(prefix: .singleDash)
+            let optionFormatter: OptionFormatter = .init(prefix: .singleDash)
 
             @Option var configuration: Configuration = .arm64
             @Flag var buildTests: Bool
@@ -105,7 +104,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
                     buildTests: true
                 )
             ).arguments(),
-            ["parent", "--product", "OtherTarget", "child", "-configuration", "arm64", "-buildTests"]
+            ["parent", "--product OtherTarget", "child", "-configuration arm64", "-buildTests"]
         )
 
         XCTAssertEqual(
@@ -117,14 +116,14 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
                     buildTests: false
                 )
             ).arguments(),
-            ["parent", "--verbose", "child", "-configuration", "x86_64"]
+            ["parent", "--verbose", "child", "-configuration x86_64"]
         )
     }
 
     private enum ParentEnumCommand: TopLevelCommandRepresentable {
         func commandValue() -> Command { "parent" }
-        var flagFormatter: FlagFormatter { .singleDashPrefix }
-        var optionFormatter: OptionFormatter { .singleDashPrefix }
+        var flagFormatter: FlagFormatter { FlagFormatter(prefix: .singleDash) }
+        var optionFormatter: OptionFormatter { OptionFormatter(prefix: .singleDash) }
 
         case run(asyncMain: Flag, skipBuild: Flag)
         case test(numWorkers: Option<Int>, testProduct: Option<String>)
@@ -133,8 +132,8 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
 
     private struct ChildEnumCommand: TopLevelCommandRepresentable {
         func commandValue() -> Command { "child" }
-        let flagFormatter: FlagFormatter = .singleDashPrefix
-        let optionFormatter: OptionFormatter = .singleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .singleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .singleDash)
 
         @Option var configuration: Configuration = .arm64
         @Flag var buildTests: Bool
@@ -176,14 +175,14 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
     func testEnumTest() throws {
         XCTAssertEqual(
             ParentEnumCommand.test(numWorkers: 2, testProduct: "PackageTarget").arguments(),
-            ["parent", "-numWorkers", "2", "-testProduct", "PackageTarget"]
+            ["parent", "-numWorkers 2", "-testProduct PackageTarget"]
         )
     }
 
     func testEnumChild() throws {
         XCTAssertEqual(
             ParentEnumCommand.child(ChildEnumCommand(configuration: .arm64, buildTests: true)).arguments(),
-            ["parent", "child", "-configuration", "arm64", "-buildTests"]
+            ["parent", "child", "-configuration arm64", "-buildTests"]
         )
     }
 }

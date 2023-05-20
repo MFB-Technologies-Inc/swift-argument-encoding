@@ -9,8 +9,8 @@ import XCTest
 
 final class ArgumentGroupTests: XCTestCase {
     private struct EmptyGroup: ArgumentGroup, FormatterNode {
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
     }
 
     func testEmptyGroup() throws {
@@ -18,15 +18,17 @@ final class ArgumentGroupTests: XCTestCase {
     }
 
     private struct Group: ArgumentGroup, FormatterNode {
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
 
         @Flag var asyncMain: Bool
         @Option var numThreads: Int = 0
+        @Positional var target: String
 
-        init(asyncMain: Bool, numThreads: Int) {
+        init(asyncMain: Bool, numThreads: Int, target: String) {
             self.asyncMain = asyncMain
             self.numThreads = numThreads
+            _target = Positional(value: target)
         }
     }
 
@@ -34,45 +36,51 @@ final class ArgumentGroupTests: XCTestCase {
         XCTAssertEqual(
             Group(
                 asyncMain: false,
-                numThreads: 2
+                numThreads: 2,
+                target: "target"
             ).arguments(),
-            ["--numThreads", "2"]
+            ["--numThreads 2", "target"]
         )
 
         XCTAssertEqual(
             Group(
                 asyncMain: true,
-                numThreads: 0
+                numThreads: 0,
+                target: "target"
             ).arguments(),
-            ["--asyncMain", "--numThreads", "0"]
+            ["--asyncMain", "--numThreads 0", "target"]
         )
     }
 
     private struct ParentGroup: ArgumentGroup, FormatterNode {
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
 
         @Flag var asyncMain: Bool
         @Option var numThreads: Int = 0
+        @Positional var target: String
         var child: ChildGroup
 
-        init(asyncMain: Bool, numThreads: Int, child: ChildGroup) {
+        init(asyncMain: Bool, numThreads: Int, target: String, child: ChildGroup) {
             self.asyncMain = asyncMain
             self.numThreads = numThreads
+            _target = Positional(value: target)
             self.child = child
         }
     }
 
     private struct ChildGroup: ArgumentGroup, FormatterNode {
-        let flagFormatter: FlagFormatter = .singleDashPrefix
-        let optionFormatter: OptionFormatter = .singleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .singleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .singleDash)
 
         @Option var configuration: Configuration = .arm64
         @Flag var buildTests: Bool
+        @Positional var target: String
 
-        init(configuration: Configuration, buildTests: Bool) {
+        init(configuration: Configuration, buildTests: Bool, target: String) {
             self.configuration = configuration
             self.buildTests = buildTests
+            _target = Positional(value: target)
         }
 
         enum Configuration: String, CustomStringConvertible {
@@ -88,24 +96,28 @@ final class ArgumentGroupTests: XCTestCase {
             ParentGroup(
                 asyncMain: false,
                 numThreads: 2,
+                target: "target",
                 child: ChildGroup(
                     configuration: .arm64,
-                    buildTests: false
+                    buildTests: false,
+                    target: "target"
                 )
             ).arguments(),
-            ["--numThreads", "2", "-configuration", "arm64"]
+            ["--numThreads 2", "target", "-configuration arm64", "target"]
         )
 
         XCTAssertEqual(
             ParentGroup(
                 asyncMain: true,
                 numThreads: 1,
+                target: "target",
                 child: ChildGroup(
                     configuration: .x86_64,
-                    buildTests: true
+                    buildTests: true,
+                    target: "target"
                 )
             ).arguments(),
-            ["--asyncMain", "--numThreads", "1", "-configuration", "x86_64", "-buildTests"]
+            ["--asyncMain", "--numThreads 1", "target", "-configuration x86_64", "-buildTests", "target"]
         )
     }
 
@@ -159,8 +171,8 @@ final class ArgumentGroupTests: XCTestCase {
     }
 
     private enum ParentEnumGroup: ArgumentGroup, FormatterNode {
-        var flagFormatter: FlagFormatter { .singleDashPrefix }
-        var optionFormatter: OptionFormatter { .singleDashPrefix }
+        var flagFormatter: FlagFormatter { FlagFormatter(prefix: .singleDash) }
+        var optionFormatter: OptionFormatter { OptionFormatter(prefix: .singleDash) }
 
         case run(asyncMain: Flag, skipBuild: Flag)
         case test(numWorkers: Option<Int>, testProduct: Option<String>)
@@ -191,13 +203,13 @@ final class ArgumentGroupTests: XCTestCase {
     func testEnumGroupTest() throws {
         XCTAssertEqual(
             ParentEnumGroup.test(numWorkers: 2, testProduct: "PackageTarget").arguments(),
-            ["-numWorkers", "2", "-testProduct", "PackageTarget"]
+            ["-numWorkers 2", "-testProduct PackageTarget"]
         )
     }
 
     private struct DeepNestedA: ArgumentGroup, FormatterNode {
-        let flagFormatter: FlagFormatter = .doubleDashPrefix
-        let optionFormatter: OptionFormatter = .doubleDashPrefix
+        let flagFormatter: FlagFormatter = .init(prefix: .doubleDash)
+        let optionFormatter: OptionFormatter = .init(prefix: .doubleDash)
 
         @Flag var deepNestedA: Bool = true
         var deepNestedB: DeepNestedB = .init()
@@ -236,13 +248,13 @@ final class ArgumentGroupTests: XCTestCase {
 }
 
 extension Array: ArgumentGroup, FormatterNode {
-    public var flagFormatter: ArgumentEncoding.FlagFormatter { .doubleDashPrefix }
+    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-    public var optionFormatter: ArgumentEncoding.OptionFormatter { .doubleDashPrefix }
+    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
 }
 
 extension Dictionary: ArgumentGroup, FormatterNode {
-    public var flagFormatter: ArgumentEncoding.FlagFormatter { .doubleDashPrefix }
+    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-    public var optionFormatter: ArgumentEncoding.OptionFormatter { .doubleDashPrefix }
+    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
 }

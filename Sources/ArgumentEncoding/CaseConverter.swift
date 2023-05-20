@@ -7,11 +7,12 @@ import Foundation
 
 /// Convert from Swift's typical camelCase to kebab-case and snake_case as some argument formats require them.
 public enum CaseConverter {
-    public static let kebabCase: (String) -> String = fromCamelCase(template: "$1-$2")
+    public static let kebabCase: @Sendable (String) -> String = fromCamelCase(template: "$1-$2")
 
-    public static let snakeCase: (String) -> String = fromCamelCase(template: "$1_$2")
+    public static let snakeCase: @Sendable (String) -> String = fromCamelCase(template: "$1_$2")
 
-    private static func fromCamelCase(template: String) -> (String) -> String {
+    @Sendable
+    private static func fromCamelCase(template: String) -> @Sendable (String) -> String {
         guard let regex = try? NSRegularExpression(pattern: "([a-z0-9])([A-Z])", options: []) else {
             return { $0 }
         }

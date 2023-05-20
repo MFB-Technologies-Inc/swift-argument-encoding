@@ -11,31 +11,31 @@ final class OptionTests: XCTestCase {
     func testOption() throws {
         let option = Option(key: "configuration", value: "release")
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             option.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release"])
+        XCTAssertEqual(args, ["--configuration release"])
     }
 
     func testBothRawValueAndStringConvertible() throws {
         let option = Option(key: "configuration", value: RawValueCustomStringConvertible(rawValue: "release"))
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             option.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release"])
+        XCTAssertEqual(args, ["--configuration release"])
     }
 
     func testBothRawValueAndStringConvertibleContainer() throws {
         let container = Container(configuration: RawValueCustomStringConvertible(rawValue: "release"))
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             container.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release"])
+        XCTAssertEqual(args, ["--configuration release"])
     }
 }
 

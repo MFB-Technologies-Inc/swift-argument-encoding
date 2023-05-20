@@ -1,4 +1,4 @@
-// Option.swift
+// OptionSet.swift
 // ArgumentEncoding
 //
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
@@ -6,80 +6,83 @@
 import Dependencies
 import Foundation
 
-/// A key/value pair argument that provides a given value for a option or variable.
+/// A sequence of key/value pair arguments that provides a given value for a option set or variable.
 ///
-/// If an option is not contained within an ``ArgumentGroup`` it needs an explicit `key` value. The explicit `key` value
+/// If an option set is not contained within an ``ArgumentGroup`` it needs an explicit `key` value. The explicit `key`
+/// value
 /// may be provided when initialized or when calling `arguments(key: String? = nil) -> [String]`.
 ///
 /// ```swift
-/// let standaloneOption = Option("name", value: "value")
+/// let standaloneOptionSet = OptionSet("name", value: ["value1", "value2])
 ///
-/// standAloneOption.arguments() == ["--name", "value]
+/// standAloneOptionSet.arguments() == ["--name", "value1", "--name", "value2"]
 /// ```
 ///
-/// Usually, an option should be contained within a ``ArgumentGroup`` conforming type that will provide a `key` value.
+/// Usually, an option set should be contained within a ``ArgumentGroup`` conforming type that will provide a `key`
+/// value.
 ///
 /// ```swift
 /// struct Container: ArgumentGroup, FormatterNode {
 ///     let flagFormatter: FlagFormatter = .doubleDashPrefix
-///     let optionFormatter: OptionFormatter = OptionFormatter(prefix: .doubleDash)
+///     let optionFormatter: OptionSetFormatter = .doubleDashPrefix
 ///
-///     @Option var name: String = "value"
+///     @OptionSet var name: String = ["value1", "value2"]
 /// }
 ///
-/// Container().arguments() == ["--name", "value"]
+/// OptionSetContainer().arguments() == ["--name", "value1", "--name", "value2"]
 /// ```
 @propertyWrapper
-public struct Option<Value>: OptionProtocol {
+public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
     /// Explicitly specify the key value
     public let keyOverride: String?
     public var wrappedValue: Value
 
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
-    private let unwrap: @Sendable (Value) -> String?
-    internal var unwrapped: String? {
-        unwrap(wrappedValue)
+    private let unwrap: @Sendable (Value.Element) -> String?
+    internal var unwrapped: [String] {
+        wrappedValue.compactMap(unwrap)
     }
 
-    func encoding(key: String? = nil) -> OptionEncoding? {
+    func encoding(key: String? = nil) -> OptionSetEncoding {
         guard let _key = keyOverride ?? key else {
-            return nil
+            return OptionSetEncoding(values: [])
         }
-        guard let unwrapped else {
-            return nil
-        }
-        return OptionEncoding(key: _key, value: unwrapped)
+        return OptionSetEncoding(values: unwrapped.map { OptionEncoding(key: _key, value: $0) })
     }
 
-    /// Get the Option's argument encoding. If `keyOverRide` and `key` are both `nil`, it will return an empty array.
+    /// Get the OptionSet's argument encoding. If `keyOverRide` and `key` are both `nil`, it will return an empty array.
     ///
     /// - Parameters
-    ///     - key: Optionally provide a key value.
+    ///     - key: OptionSetally provide a key value.
     /// - Returns: The argument encoding which is an array of strings
     public func arguments(key: String? = nil) -> [String] {
-        encoding(key: key)?.arguments() ?? []
+        encoding(key: key).arguments()
     }
 
-    /// Initializes a new option when not used as a `@propertyWrapper`
+    /// Initializes a new option set when not used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
     ///     - unwrap: A closure for mapping a Value to [String]
-    public init(key: some CustomStringConvertible, value: Value, unwrap: @escaping @Sendable (Value) -> String?) {
+    public init(
+        key: some CustomStringConvertible,
+        value: Value,
+        unwrap: @escaping @Sendable (Value.Element) -> String?
+    ) {
         keyOverride = key.description
         wrappedValue = value
         self.unwrap = unwrap
     }
 
-    /// Initializes a new option when used as a `@propertyWrapper`
+    /// Initializes a new option set when used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
-    ///     - _ key: Optional explicit key value
+    ///     - _ key: OptionSetal explicit key value
     ///     - _ unwrap: A closure for mapping a Value to [String]
-    public init(wrappedValue: Value, _ key: String? = nil, _ unwrap: @escaping @Sendable (Value) -> String?) {
+    public init(wrappedValue: Value, _ key: String? = nil, _ unwrap: @escaping @Sendable (Value.Element) -> String?) {
         keyOverride = key
         self.wrappedValue = wrappedValue
         self.unwrap = unwrap
@@ -88,14 +91,14 @@ public struct Option<Value>: OptionProtocol {
 
 // MARK: Conditional Conformances
 
-extension Option: Equatable where Value: Equatable {
-    public static func == (lhs: Option<Value>, rhs: Option<Value>) -> Bool {
+extension OptionSet: Equatable where Value: Equatable {
+    public static func == (lhs: OptionSet<Value>, rhs: OptionSet<Value>) -> Bool {
         lhs.keyOverride == rhs.keyOverride
             && lhs.unwrapped == rhs.unwrapped
     }
 }
 
-extension Option: Hashable where Value: Hashable {
+extension OptionSet: Hashable where Value: Hashable {
     public func hash(into hasher: inout Hasher) {
         hasher.combine(keyOverride)
         hasher.combine(unwrapped)
@@ -103,12 +106,12 @@ extension Option: Hashable where Value: Hashable {
     }
 }
 
-extension Option: Sendable where Value: Sendable {}
+extension OptionSet: Sendable where Value: Sendable {}
 
 // MARK: Convenience initializers when Value: CustomStringConvertible
 
-extension Option where Value: CustomStringConvertible {
-    /// Initializes a new option when not used as a `@propertyWrapper`
+extension OptionSet where Value.Element: CustomStringConvertible {
+    /// Initializes a new option set when not used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - key: Explicit key value
@@ -119,7 +122,7 @@ extension Option where Value: CustomStringConvertible {
         unwrap = Self.unwrap(_:)
     }
 
-    /// Initializes a new option when used as a `@propertyWrapper`
+    /// Initializes a new option set when used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
@@ -131,13 +134,13 @@ extension Option where Value: CustomStringConvertible {
     }
 
     @Sendable
-    public static func unwrap(_ value: Value) -> String? {
+    public static func unwrap(_ value: Value.Element) -> String? {
         value.description
     }
 }
 
-extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConvertible {
-    /// Initializes a new option when not used as a `@propertyWrapper`
+extension OptionSet where Value.Element: RawRepresentable, Value.Element.RawValue: CustomStringConvertible {
+    /// Initializes a new option set when not used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - key: Explicit key value
@@ -148,7 +151,7 @@ extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConv
         unwrap = Self.unwrap(_:)
     }
 
-    /// Initializes a new option when used as a `@propertyWrapper`
+    /// Initializes a new option set when used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
@@ -160,15 +163,15 @@ extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConv
     }
 
     @Sendable
-    public static func unwrap(_ value: Value) -> String? {
+    public static func unwrap(_ value: Value.Element) -> String? {
         value.rawValue.description
     }
 }
 
-extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
-    Value.RawValue: CustomStringConvertible
+extension OptionSet where Value.Element: CustomStringConvertible, Value.Element: RawRepresentable,
+    Value.Element.RawValue: CustomStringConvertible
 {
-    /// Initializes a new option when not used as a `@propertyWrapper`
+    /// Initializes a new option set when not used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - key: Explicit key value
@@ -179,7 +182,7 @@ extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
         unwrap = Self.unwrap(_:)
     }
 
-    /// Initializes a new option when used as a `@propertyWrapper`
+    /// Initializes a new option set when used as a `@propertyWrapper`
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
@@ -191,98 +194,21 @@ extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
     }
 
     @Sendable
-    public static func unwrap(_ value: Value) -> String? {
+    public static func unwrap(_ value: Value.Element) -> String? {
         value.rawValue.description
-    }
-}
-
-// MARK: Convenience initializers when Value == Optional<Wrapped>
-
-extension Option {
-    /// Initializes a new option when not used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - key: Explicit key value
-    ///     - wrappedValue: The underlying value
-    public init<Wrapped>(key: some CustomStringConvertible, value: Wrapped?) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
-    {
-        keyOverride = key.description
-        wrappedValue = value
-        unwrap = Self.unwrap(_:)
-    }
-
-    /// Initializes a new option when used as a `@propertyWrapper`
-    ///
-    /// - Parameters
-    ///     - wrappedValue: The underlying value
-    ///     - _ key: Optional explicit key value
-    public init<Wrapped>(wrappedValue: Wrapped?, _ key: String? = nil) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
-    {
-        keyOverride = key
-        self.wrappedValue = wrappedValue
-        unwrap = Self.unwrap(_:)
-    }
-
-    @Sendable
-    public static func unwrap<Wrapped>(_ value: Wrapped?) -> String? where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
-    {
-        value?.description
-    }
-}
-
-// MARK: ExpressibleBy...Literal conformances
-
-extension Option: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.IntegerLiteralType == Int {
-    public init(integerLiteral value: IntegerLiteralType) {
-        self.init(wrappedValue: Value(integerLiteral: value), nil) { $0.description }
-    }
-}
-
-#if os(macOS)
-    extension Option: ExpressibleByFloatLiteral where Value: BinaryFloatingPoint {
-        public init(floatLiteral value: FloatLiteralType) {
-            self.init(wrappedValue: Value(value), nil) { $0.formatted() }
-        }
-    }
-#endif
-
-extension Option: ExpressibleByExtendedGraphemeClusterLiteral where Value: StringProtocol {
-    public init(extendedGraphemeClusterLiteral value: String) {
-        self.init(wrappedValue: Value(stringLiteral: value))
-    }
-}
-
-extension Option: ExpressibleByUnicodeScalarLiteral where Value: StringProtocol {
-    public init(unicodeScalarLiteral value: String) {
-        self.init(wrappedValue: Value(stringLiteral: value))
-    }
-}
-
-extension Option: ExpressibleByStringLiteral where Value: StringProtocol {
-    public init(stringLiteral value: StringLiteralType) {
-        self.init(wrappedValue: Value(stringLiteral: value))
-    }
-}
-
-extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
-    public init(stringInterpolation: DefaultStringInterpolation) {
-        self.init(wrappedValue: Value(stringInterpolation: stringInterpolation))
     }
 }
 
 // MARK: Coding
 
-extension Option: DecodableWithConfiguration where Value: Decodable {
-    public init(from decoder: Decoder, configuration: @escaping @Sendable (Value) -> String?) throws {
+extension OptionSet: DecodableWithConfiguration where Value: Decodable {
+    public init(from decoder: Decoder, configuration: @escaping @Sendable (Value.Element) -> String?) throws {
         let container = try decoder.singleValueContainer()
         try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
     }
 }
 
-extension Option: Decodable where Value: Decodable {
+extension OptionSet: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey(for: Value.Type.self) else {
@@ -315,7 +241,7 @@ extension Option: Decodable where Value: Decodable {
     }
 }
 
-extension Option: Encodable where Value: Encodable {
+extension OptionSet: Encodable where Value: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)
@@ -329,21 +255,20 @@ extension Option: Encodable where Value: Encodable {
  initialized within a `withDependencies` closure so that the formatter is
  correctly injected.
  */
-struct OptionEncoding {
+struct OptionSetEncoding {
     @Dependency(\.optionFormatter) var formatter
 
-    let key: String
-    let value: String
+    let values: [OptionEncoding]
 
     func arguments() -> [String] {
-        [formatter.format(encoding: self)]
+        values.map { formatter.format(encoding: $0) }
     }
 }
 
 /*
- Since Option is generic, we need a single type to cast to in ArgumentGroup.
- OptionProtocol is that type and Option is the only type that conforms.
+ Since OptionSet is generic, we need a single type to cast to in ArgumentGroup.
+ OptionSetProtocol is that type and OptionSet is the only type that conforms.
  */
-protocol OptionProtocol {
+protocol OptionSetProtocol {
     func arguments(key: String?) -> [String]
 }
