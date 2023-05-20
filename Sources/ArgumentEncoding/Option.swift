@@ -22,7 +22,7 @@ import Foundation
 /// ```swift
 /// struct Container: ArgumentGroup, FormatterNode {
 ///     let flagFormatter: FlagFormatter = .doubleDashPrefix
-///     let optionFormatter: OptionFormatter = .doubleDashPrefix
+///     let optionFormatter: OptionFormatter = OptionFormatter(prefix: .doubleDash)
 ///
 ///     @Option var name: String = "value"
 /// }
@@ -336,7 +336,7 @@ struct OptionEncoding {
     let value: String
 
     func arguments() -> [String] {
-        formatter.format(encoding: self)
+        [formatter.format(encoding: self)]
     }
 }
 

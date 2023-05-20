@@ -22,7 +22,7 @@ import Dependencies
 /// ```swift
 /// struct FlagContainer: ArgumentGroup, FormatterNode {
 ///     let flagFormatter: FlagFormatter = .doubleDashPrefix
-///     let optionFormatter: OptionFormatter = .doubleDashPrefix
+///     let optionFormatter: OptionFormatter = OptionFormatter(prefix: .doubleDash)
 ///
 ///     @Flag var name: Bool = true
 /// }

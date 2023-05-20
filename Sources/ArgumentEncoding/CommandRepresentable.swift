@@ -13,7 +13,7 @@ import Dependencies
 /// struct ParentGroup: CommandRepresentable {
 ///     // Formatters to satisfy `FormatterNode` requirements
 ///     let flagFormatter: FlagFormatter = .doubleDashPrefix
-///     let optionFormatter: OptionFormatter = .doubleDashPrefix
+///     let optionFormatter: OptionFormatter = OptionFormatter(prefix: .doubleDash)
 ///
 ///     // Properties that represent the child arguments
 ///     @Flag var asyncMain: Bool

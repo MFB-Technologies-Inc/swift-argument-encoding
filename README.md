@@ -18,8 +18,8 @@ Typically, modeling a CLI tool will begin with a `TopLevelCommandRepresentable`.
 ```swift
 struct MyCommand: TopLevelCommandRepresentable {
     func commandValue() -> Command { "my-command" }
-    var flagFormatter: FlagFormatter { .doubleDashPrefix }
-    var optionFormatter: OptionFormatter { .doubleDashPrefix }
+    let flagFormatter = FlagFormatter(prefix: .doubleDash) }
+    let optionFormatter = OptionFormatter(prefix: .doubleDash) }
 }
 ```
 
@@ -30,8 +30,8 @@ Within `MyCommand` we need the ability to model a boolean value to enable/disabl
 ```swift
 struct MyCommand: TopLevelCommandRepresentable {
     func commandValue() -> Command { "my-command" }
-    var flagFormatter: FlagFormatter { .doubleDashPrefix }
-    var optionFormatter: OptionFormatter { .doubleDashPrefix }
+    let flagFormatter = FlagFormatter(prefix: .doubleDash) }
+    let optionFormatter = OptionFormatter(prefix: .doubleDash) }
 
     @Flag var myFlag: Bool = false
 }
@@ -42,8 +42,8 @@ In addition to modeling the ability to enable/disable a feature, we need to set 
 ```swift
 struct MyCommand: TopLevelCommandRepresentable {
     func commandValue() -> Command { "my-command" }
-    var flagFormatter: FlagFormatter { .doubleDashPrefix }
-    var optionFormatter: OptionFormatter { .doubleDashPrefix }
+    let flagFormatter = FlagFormatter(prefix: .doubleDash) }
+    let optionFormatter = OptionFormatter(prefix: .doubleDash) }
 
     @Flag var myFlag: Bool = false
     @Option var myOption: Int = 0
@@ -56,8 +56,8 @@ Positional arguments that are just a value, with no key are supported through th
 ```swift
 struct MyCommand: TopLevelCommandRepresentable {
     func commandValue() -> Command { "my-command" }
-    var flagFormatter: FlagFormatter { .doubleDashPrefix }
-    var optionFormatter: OptionFormatter { .doubleDashPrefix }
+    let flagFormatter = FlagFormatter(prefix: .doubleDash) }
+    let optionFormatter = OptionFormatter(prefix: .doubleDash) }
 
     @Flag var myFlag: Bool = false
     @Option var myOption: Int = 0
@@ -130,17 +130,14 @@ import ArgumentEncoding
 enum SwiftCommand: TopLevelCommandRepresentable {
     func commandValue() -> Command { "swift" }
 
-    var flagFormatter: FlagFormatter { .doubleDashPrefixKebabCase }
-    var optionFormatter: OptionFormatter { .doubleDashPrefixKebabCase }
+    var flagFormatter: FlagFormatter { FlagFormatter(prefix: .doubleDash, body: .kebabCase) }
+    var optionFormatter: OptionFormatter { OptionFormatter(prefix: .doubleDash, body: .kebabCase) }
 
     case run(RunCommand)
     case test(TestCommand)
 }
 
 struct RunCommand: CommandRepresentable {
-    let flagFormatter: FlagFormatter = .doubleDashPrefixKebabCase
-    let optionFormatter: OptionFormatter = .doubleDashPrefixKebabCase
-
     @Positional var executable: String
 }
 
@@ -151,9 +148,6 @@ extension RunCommand: ExpressibleByStringLiteral {
 }
 
 struct TestCommand: CommandRepresentable {
-    let flagFormatter: FlagFormatter = .doubleDashPrefixKebabCase
-    let optionFormatter: OptionFormatter = .doubleDashPrefixKebabCase
-
     @Flag var parallel: Bool = true
     @Option var numWorkers: Int = 1
     @Flag var showCodecovPath: Bool = false

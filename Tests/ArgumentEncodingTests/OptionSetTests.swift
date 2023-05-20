@@ -11,11 +11,11 @@ final class OptionSetTests: XCTestCase {
     func testOptionSet() throws {
         let optionSet = OptionSet(key: "configuration", value: ["release", "debug"])
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             optionSet.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
+        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
     }
 
     func testBothRawValueAndStringConvertible() throws {
@@ -27,11 +27,11 @@ final class OptionSetTests: XCTestCase {
             ]
         )
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             optionSet.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
+        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
     }
 
     func testBothRawValueAndStringConvertibleContainer() throws {
@@ -40,11 +40,11 @@ final class OptionSetTests: XCTestCase {
             RawValueCustomStringConvertible(rawValue: "debug"),
         ])
         let args = withDependencies { values in
-            values.optionFormatter = .doubleDashPrefix
+            values.optionFormatter = OptionFormatter(prefix: .doubleDash)
         } operation: {
             container.arguments()
         }
-        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
+        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
     }
 }
 

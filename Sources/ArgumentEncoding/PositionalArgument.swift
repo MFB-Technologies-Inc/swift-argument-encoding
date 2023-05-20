@@ -12,7 +12,7 @@ import Foundation
 /// ```swift
 /// struct Container: ArgumentGroup, FormatterNode {
 ///     let flagFormatter: FlagFormatter = .doubleDashPrefix
-///     let optionFormatter: OptionFormatter = .doubleDashPrefix
+///     let optionFormatter: OptionFormatter = OptionFormatter(prefix: .doubleDash)
 ///
 ///     @Positional var name: String = "value"
 /// }

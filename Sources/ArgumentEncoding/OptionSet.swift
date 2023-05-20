@@ -261,7 +261,7 @@ struct OptionSetEncoding {
     let values: [OptionEncoding]
 
     func arguments() -> [String] {
-        values.map { formatter.format(encoding: $0) }.flatMap { $0 }
+        values.map { formatter.format(encoding: $0) }
     }
 }
 
