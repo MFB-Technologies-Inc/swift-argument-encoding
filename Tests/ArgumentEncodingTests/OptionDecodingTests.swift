@@ -14,8 +14,7 @@ final class OptionDecodingTests: XCTestCase {
         let option = Option(wrappedValue: "value")
         let data = try encoder.encode(option)
         let decoder = JSONDecoder()
-        let configurationKey = try XCTUnwrap(Option<String>.configurationCodingUserInfoKey())
-        decoder.userInfo[configurationKey] = Option<String>.unwrap
+        decoder.userInfo.addOptionConfiguration(for: Option<String>.self)
         let decoded = try decoder.decode(Option<String>.self, from: data)
         XCTAssertEqual(decoded, option)
     }
@@ -24,8 +23,7 @@ final class OptionDecodingTests: XCTestCase {
         let container = OptionContainer(option: "value")
         let data = try encoder.encode(container)
         let decoder = JSONDecoder()
-        let configurationKey = try XCTUnwrap(Option<String>.configurationCodingUserInfoKey())
-        decoder.userInfo[configurationKey] = Option<String>.unwrap
+        decoder.userInfo.addOptionConfiguration(for: Option<String>.self)
         let decoded = try decoder.decode(OptionContainer.self, from: data)
         XCTAssertEqual(decoded, container)
     }
