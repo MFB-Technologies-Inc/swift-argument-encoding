@@ -284,8 +284,7 @@ extension Option: DecodableWithConfiguration where Value: Decodable {
 
 extension Option: Decodable where Value: Decodable {
     public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey(for: Value.Type.self) else {
+        guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey() else {
             throw DecodingError.dataCorrupted(DecodingError.Context(
                 codingPath: decoder.codingPath,
                 debugDescription: "No CodingUserInfoKey found for accessing the DecodingConfiguration.",
@@ -307,11 +306,11 @@ extension Option: Decodable where Value: Decodable {
                 underlyingError: nil
             ))
         }
-        try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
+        try self.init(from: decoder, configuration: configuration)
     }
 
-    public static func configurationCodingUserInfoKey(for _: (some Any).Type) -> CodingUserInfoKey? {
-        CodingUserInfoKey(rawValue: ObjectIdentifier(Self.self).debugDescription)
+    public static func configurationCodingUserInfoKey() -> CodingUserInfoKey? {
+        CodingUserInfoKey(rawValue: "\(Self.self) - " + ObjectIdentifier(Self.self).debugDescription)
     }
 }
 
