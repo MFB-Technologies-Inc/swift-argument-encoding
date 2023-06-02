@@ -20,23 +20,42 @@ extension [CodingUserInfoKey: Any] {
         T: CustomStringConvertible
     {
         addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T?>.unwrap(_:))
     }
 
     public mutating func addOptionConfiguration<T>(for _: Option<T>.Type) where T: Decodable, T: RawRepresentable,
         T.RawValue: CustomStringConvertible
     {
         addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
+        addOptionConfiguration(for: Option<T>.self, configuration: { $0.rawValue.description })
+    }
+
+    public mutating func addOptionConfiguration<T>(for _: Option<T>.Type) where T: Decodable,
+        T: CustomStringConvertible,
+        T: RawRepresentable, T.RawValue: CustomStringConvertible
+    {
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T?>.unwrap(_:))
+    }
+
+    public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable,
+        T: CustomStringConvertible
+    {
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T?>.unwrap(_:))
+    }
+
+    public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: RawRepresentable,
+        T.RawValue: CustomStringConvertible
+    {
+        addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
+        addOptionConfiguration(for: Option<T>.self, configuration: { $0.rawValue.description })
     }
 
     public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: CustomStringConvertible,
         T: RawRepresentable, T.RawValue: CustomStringConvertible
     {
         addOptionConfiguration(for: Option<T>.self, configuration: Option<T>.unwrap(_:))
-    }
-
-    public mutating func addOptionConfiguration<T>(for _: Option<T?>.Type) where T: Decodable,
-        T: CustomStringConvertible
-    {
         addOptionConfiguration(for: Option<T>.self, configuration: Option<T?>.unwrap(_:))
     }
 }

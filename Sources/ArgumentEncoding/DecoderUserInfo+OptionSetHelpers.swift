@@ -32,6 +32,24 @@ extension [CodingUserInfoKey: Any] {
         addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
     }
 
+    public mutating func addOptionSetConfiguration<T>(for _: OptionSet<T>.Type) where T: Decodable, T: Sequence,
+        T.Element: RawRepresentable, T.Element.RawValue: CustomStringConvertible
+    {
+        addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
+    }
+
+    public mutating func addOptionSetConfiguration<T>(for _: OptionSet<T>.Type) where T: Decodable, T: Sequence,
+        T.Element: CustomStringConvertible, T.Element: RawRepresentable, T.Element.RawValue: CustomStringConvertible
+    {
+        addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
+    }
+
+    public mutating func addOptionSetConfiguration<T>(for _: T.Type) where T: Decodable, T: Sequence,
+        T.Element: CustomStringConvertible
+    {
+        addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
+    }
+
     public mutating func addOptionSetConfiguration<T>(for _: T.Type) where T: Decodable, T: Sequence,
         T.Element: RawRepresentable, T.Element.RawValue: CustomStringConvertible
     {
