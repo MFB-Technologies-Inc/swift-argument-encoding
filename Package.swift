@@ -32,7 +32,7 @@ let package = Package(
 extension Package.Dependency {
     static let dependencies: Package.Dependency = .package(
         url: "https://github.com/pointfreeco/swift-dependencies.git",
-        .upToNextMajor(from: "0.1.1")
+        .upToNextMajor(from: "1.0.0")
     )
 }
 
