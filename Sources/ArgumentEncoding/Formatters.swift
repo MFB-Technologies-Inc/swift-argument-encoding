@@ -18,7 +18,7 @@ public struct FlagFormatter: Sendable {
     }
 
     @Sendable
-    internal func _format(encoding: FlagEncoding) -> String {
+    func _format(encoding: FlagEncoding) -> String {
         format(key: encoding.key)
     }
 
@@ -52,13 +52,17 @@ public struct FlagFormatter: Sendable {
 public struct OptionFormatter: Sendable {
     public let prefix: @Sendable () -> String
     public let body: @Sendable (_ key: String) -> String
-    public let separator: @Sendable () -> String
+    public let separator: (@Sendable () -> String)?
 
-    public func format(key: String, value: String) -> String {
-        prefix() + body(key) + separator() + value
+    public func format(key: String, value: String) -> [String] {
+        if let separator {
+            return [prefix() + body(key) + separator() + value]
+        } else {
+            return [prefix() + body(key), value]
+        }
     }
 
-    internal func format(encoding: OptionEncoding) -> String {
+    func format(encoding: OptionEncoding) -> [String] {
         format(key: encoding.key, value: encoding.value)
     }
 
@@ -71,7 +75,7 @@ public struct OptionFormatter: Sendable {
     public init(
         prefix: @escaping @Sendable () -> String,
         body: @escaping @Sendable (_ key: String) -> String,
-        separator: @escaping @Sendable () -> String
+        separator: (@Sendable () -> String)?
     ) {
         self.prefix = prefix
         self.body = body
@@ -87,12 +91,12 @@ public struct OptionFormatter: Sendable {
     public init(
         prefix: PrefixFormatter = .empty,
         body: BodyFormatter = .empty,
-        separator: SeparatorFormatter = .space
+        separator: SeparatorFormatter? = nil
     ) {
         self.init(
             prefix: prefix.transform,
             body: body.transform,
-            separator: separator.transform
+            separator: separator?.transform
         )
     }
 }
@@ -133,7 +137,6 @@ public struct SeparatorFormatter: Sendable {
         self.transform = transform
     }
 
-    public static let space = Self { StaticString.space.description }
     public static let equal = Self { StaticString.equal.description }
 }
 

@@ -15,7 +15,7 @@ final class OptionSetTests: XCTestCase {
         } operation: {
             optionSet.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
+        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
     }
 
     func testBothRawValueAndStringConvertible() throws {
@@ -31,7 +31,7 @@ final class OptionSetTests: XCTestCase {
         } operation: {
             optionSet.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
+        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
     }
 
     func testBothRawValueAndStringConvertibleContainer() throws {
@@ -44,7 +44,7 @@ final class OptionSetTests: XCTestCase {
         } operation: {
             container.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release", "--configuration debug"])
+        XCTAssertEqual(args, ["--configuration", "release", "--configuration", "debug"])
     }
 }
 

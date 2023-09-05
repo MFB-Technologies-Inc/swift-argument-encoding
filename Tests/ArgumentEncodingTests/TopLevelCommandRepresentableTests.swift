@@ -41,7 +41,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
             ).arguments(),
             [
                 "swift",
-                "--product Target",
+                "--product", "Target",
             ]
         )
 
@@ -104,7 +104,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
                     buildTests: true
                 )
             ).arguments(),
-            ["parent", "--product OtherTarget", "child", "-configuration arm64", "-buildTests"]
+            ["parent", "--product", "OtherTarget", "child", "-configuration", "arm64", "-buildTests"]
         )
 
         XCTAssertEqual(
@@ -116,7 +116,7 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
                     buildTests: false
                 )
             ).arguments(),
-            ["parent", "--verbose", "child", "-configuration x86_64"]
+            ["parent", "--verbose", "child", "-configuration", "x86_64"]
         )
     }
 
@@ -175,14 +175,14 @@ final class TopLevelCommandRepresentableTests: XCTestCase {
     func testEnumTest() throws {
         XCTAssertEqual(
             ParentEnumCommand.test(numWorkers: 2, testProduct: "PackageTarget").arguments(),
-            ["parent", "-numWorkers 2", "-testProduct PackageTarget"]
+            ["parent", "-numWorkers", "2", "-testProduct", "PackageTarget"]
         )
     }
 
     func testEnumChild() throws {
         XCTAssertEqual(
             ParentEnumCommand.child(ChildEnumCommand(configuration: .arm64, buildTests: true)).arguments(),
-            ["parent", "child", "-configuration arm64", "-buildTests"]
+            ["parent", "child", "-configuration", "arm64", "-buildTests"]
         )
     }
 }

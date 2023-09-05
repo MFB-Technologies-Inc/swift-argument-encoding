@@ -46,42 +46,42 @@ final class FormatterTests: XCTestCase {
     func testOptionFormatterSingleDashPrefix() throws {
         XCTAssertEqual(
             OptionFormatter(prefix: .singleDash).format(key: "optionKey", value: "optionValue"),
-            "-optionKey optionValue"
+            ["-optionKey", "optionValue"]
         )
     }
 
     func testOptionFormatterDoubleDashPrefix() throws {
         XCTAssertEqual(
             OptionFormatter(prefix: .doubleDash).format(key: "optionKey", value: "optionValue"),
-            "--optionKey optionValue"
+            ["--optionKey", "optionValue"]
         )
     }
 
     func testOptionFormatterEmptyPrefix() throws {
         XCTAssertEqual(
             OptionFormatter(prefix: .empty).format(key: "optionKey", value: "optionValue"),
-            "optionKey optionValue"
+            ["optionKey", "optionValue"]
         )
     }
 
     func testOptionFormatterKebabCaseBody() throws {
         XCTAssertEqual(
             OptionFormatter(body: .kebabCase).format(key: "optionKey", value: "optionValue"),
-            "option-key optionValue"
+            ["option-key", "optionValue"]
         )
     }
 
     func testOptionFormatterSnakeCaseBody() throws {
         XCTAssertEqual(
             OptionFormatter(body: .snakeCase).format(key: "optionKey", value: "optionValue"),
-            "option_key optionValue"
+            ["option_key", "optionValue"]
         )
     }
 
     func testOptionFormatterEqualSeparator() throws {
         XCTAssertEqual(
             OptionFormatter(separator: .equal).format(key: "optionKey", value: "optionValue"),
-            "optionKey=optionValue"
+            ["optionKey=optionValue"]
         )
     }
 }
