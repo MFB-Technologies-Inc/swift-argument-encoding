@@ -15,8 +15,12 @@ jobs:
     environment: default
     steps:
       - uses: actions/checkout@v3
+      - name: SwiftFormat version
+        run: swiftformat --version
       - name: Format lint
         run: swiftformat --lint .
+      - name: SwiftLint version
+        run: swiftlint --version
       - name: Lint
         run: swiftlint lint --quiet
   macos-test:
