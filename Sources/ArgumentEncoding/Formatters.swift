@@ -21,7 +21,7 @@ public struct FlagFormatter: Sendable {
     }
 
     @Sendable
-    internal func _format(encoding: FlagEncoding) -> String {
+    func _format(encoding: FlagEncoding) -> String {
         format(key: encoding.key)
     }
 
@@ -61,7 +61,7 @@ public struct OptionFormatter: Sendable {
         prefix() + body(key) + separator() + value
     }
 
-    internal func format(encoding: OptionEncoding) -> String {
+    func format(encoding: OptionEncoding) -> String {
         format(key: encoding.key, value: encoding.value)
     }
 

@@ -41,7 +41,7 @@ public struct Option<Value>: OptionProtocol {
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
     private let unwrap: @Sendable (Value) -> String?
-    internal var unwrapped: String? {
+    var unwrapped: String? {
         unwrap(wrappedValue)
     }
 

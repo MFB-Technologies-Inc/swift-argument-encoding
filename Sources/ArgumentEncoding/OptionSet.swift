@@ -43,7 +43,7 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
     private let unwrap: @Sendable (Value.Element) -> String?
-    internal var unwrapped: [String] {
+    var unwrapped: [String] {
         wrappedValue.compactMap(unwrap)
     }
 
