@@ -2,6 +2,9 @@
 // ArgumentEncoding
 //
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
+//
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
 
 import Dependencies
 import XCTestDynamicOverlay
@@ -18,7 +21,7 @@ public struct FlagFormatter: Sendable {
     }
 
     @Sendable
-    internal func _format(encoding: FlagEncoding) -> String {
+    func _format(encoding: FlagEncoding) -> String {
         format(key: encoding.key)
     }
 
@@ -58,7 +61,7 @@ public struct OptionFormatter: Sendable {
         prefix() + body(key) + separator() + value
     }
 
-    internal func format(encoding: OptionEncoding) -> String {
+    func format(encoding: OptionEncoding) -> String {
         format(key: encoding.key, value: encoding.value)
     }
 

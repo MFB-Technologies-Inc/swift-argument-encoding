@@ -2,6 +2,9 @@
 // ArgumentEncoding
 //
 // Copyright © 2023 MFB Technologies, Inc. All rights reserved.
+//
+// This source code is licensed under the MIT license found in the
+// LICENSE file in the root directory of this source tree.
 
 /// A type that represents a command type argument that is not a child of an `ArgumentGroup`.
 ///
