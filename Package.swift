@@ -27,6 +27,17 @@ let package = Package(
     ]
 )
 
+package.targets.strictConcurrency()
+
+extension Array where Element == Target {
+    func strictConcurrency() {
+        forEach { target in
+            target.swiftSettings = (target.swiftSettings ?? [])
+                + [.enableUpcomingFeature("StrictConcurrency")]
+        }
+    }
+}
+
 // MARK: PointFree
 
 extension Package.Dependency {
