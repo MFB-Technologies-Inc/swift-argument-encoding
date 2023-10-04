@@ -29,7 +29,7 @@ let package = Package(
 
 package.targets.strictConcurrency()
 
-extension Array where Element == Target {
+extension [Target] {
     func strictConcurrency() {
         forEach { target in
             target.swiftSettings = (target.swiftSettings ?? [])
