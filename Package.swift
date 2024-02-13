@@ -16,27 +16,18 @@ let package = Package(
             name: "ArgumentEncoding",
             dependencies: [
                 .dependencies,
-            ]
+            ],
+            swiftSettings: .swiftSix
         ),
         .testTarget(
             name: "ArgumentEncodingTests",
             dependencies: [
                 "ArgumentEncoding",
-            ]
+            ],
+            swiftSettings: .swiftSix
         ),
     ]
 )
-
-package.targets.strictConcurrency()
-
-extension [Target] {
-    func strictConcurrency() {
-        forEach { target in
-            target.swiftSettings = (target.swiftSettings ?? [])
-                + [.enableUpcomingFeature("StrictConcurrency")]
-        }
-    }
-}
 
 // MARK: PointFree
 
@@ -49,4 +40,17 @@ extension Package.Dependency {
 
 extension Target.Dependency {
     static let dependencies: Self = .product(name: "Dependencies", package: "swift-dependencies")
+}
+
+extension [SwiftSetting] {
+    static let swiftSix: Self = [
+        .enableUpcomingFeature("BareSlashRegexLiterals"),
+        .enableUpcomingFeature("ConciseMagicFile"),
+        .enableUpcomingFeature("DeprecateApplicationMain"),
+        .enableUpcomingFeature("DisableOutwardActorInference"),
+        .enableUpcomingFeature("ForwardTrailingClosures"),
+        .enableUpcomingFeature("ImportObjcForwardDeclarations"),
+        .enableUpcomingFeature("InternalImportsByDefault"),
+        .enableUpcomingFeature("StrictConcurrency"),
+    ]
 }
