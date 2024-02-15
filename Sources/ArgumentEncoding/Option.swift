@@ -338,7 +338,7 @@ struct OptionEncoding {
     let value: String
 
     func arguments() -> [String] {
-        [formatter.format(encoding: self)]
+        formatter.format(encoding: self)
     }
 }
 

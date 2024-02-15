@@ -42,7 +42,7 @@ final class ArgumentGroupTests: XCTestCase {
                 numThreads: 2,
                 target: "target"
             ).arguments(),
-            ["--numThreads 2", "target"]
+            ["--numThreads", "2", "target"]
         )
 
         XCTAssertEqual(
@@ -51,7 +51,7 @@ final class ArgumentGroupTests: XCTestCase {
                 numThreads: 0,
                 target: "target"
             ).arguments(),
-            ["--asyncMain", "--numThreads 0", "target"]
+            ["--asyncMain", "--numThreads", "0", "target"]
         )
     }
 
@@ -106,7 +106,7 @@ final class ArgumentGroupTests: XCTestCase {
                     target: "target"
                 )
             ).arguments(),
-            ["--numThreads 2", "target", "-configuration arm64", "target"]
+            ["--numThreads", "2", "target", "-configuration", "arm64", "target"]
         )
 
         XCTAssertEqual(
@@ -120,7 +120,7 @@ final class ArgumentGroupTests: XCTestCase {
                     target: "target"
                 )
             ).arguments(),
-            ["--asyncMain", "--numThreads 1", "target", "-configuration x86_64", "-buildTests", "target"]
+            ["--asyncMain", "--numThreads", "1", "target", "-configuration", "x86_64", "-buildTests", "target"]
         )
     }
 
@@ -206,7 +206,7 @@ final class ArgumentGroupTests: XCTestCase {
     func testEnumGroupTest() throws {
         XCTAssertEqual(
             ParentEnumGroup.test(numWorkers: 2, testProduct: "PackageTarget").arguments(),
-            ["-numWorkers 2", "-testProduct PackageTarget"]
+            ["-numWorkers", "2", "-testProduct", "PackageTarget"]
         )
     }
 
