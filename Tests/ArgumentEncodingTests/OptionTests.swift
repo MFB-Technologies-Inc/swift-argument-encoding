@@ -18,7 +18,7 @@ final class OptionTests: XCTestCase {
         } operation: {
             option.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release"])
+        XCTAssertEqual(args, ["--configuration", "release"])
     }
 
     func testBothRawValueAndStringConvertible() throws {
@@ -28,7 +28,7 @@ final class OptionTests: XCTestCase {
         } operation: {
             option.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release"])
+        XCTAssertEqual(args, ["--configuration", "release"])
     }
 
     func testBothRawValueAndStringConvertibleContainer() throws {
@@ -38,7 +38,7 @@ final class OptionTests: XCTestCase {
         } operation: {
             container.arguments()
         }
-        XCTAssertEqual(args, ["--configuration release"])
+        XCTAssertEqual(args, ["--configuration", "release"])
     }
 }
 

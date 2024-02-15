@@ -13,11 +13,11 @@ import XCTestDynamicOverlay
 public struct FlagFormatter: Sendable {
     /// Formats a key string
     public let prefix: @Sendable () -> String
-    public let body: @Sendable (_ key: String) -> String
+    public let key: @Sendable (_ key: String) -> String
 
     @Sendable
     public func format(key: String) -> String {
-        prefix() + body(key)
+        prefix() + self.key(key)
     }
 
     @Sendable
@@ -29,24 +29,24 @@ public struct FlagFormatter: Sendable {
     ///
     /// - Parameters
     ///   - prefix: Closure that returns the prefix string
-    ///   - body: Closure that transforms the key string for formatting
+    ///   - key: Closure that transforms the key string for formatting
     public init(
         prefix: @escaping @Sendable () -> String,
-        body: @escaping @Sendable (_ key: String) -> String
+        key: @escaping @Sendable (_ key: String) -> String
     ) {
         self.prefix = prefix
-        self.body = body
+        self.key = key
     }
 
     /// Initialize a new formatter
     ///
     /// - Parameters
     ///   - prefix: Name spaced closure that returns the prefix string for a Flag
-    ///   - body: Name spaced closure that transforms the key string for formatting
-    public init(prefix: PrefixFormatter = .empty, body: BodyFormatter = .empty) {
+    ///   - key: Name spaced closure that transforms the key string for formatting
+    public init(prefix: PrefixFormatter = .empty, key: KeyFormatter = .empty) {
         self.init(
             prefix: prefix.transform,
-            body: body.transform
+            key: key.transform
         )
     }
 }
@@ -54,14 +54,15 @@ public struct FlagFormatter: Sendable {
 /// Formats `Option`s to match how different executables format arguments
 public struct OptionFormatter: Sendable {
     public let prefix: @Sendable () -> String
-    public let body: @Sendable (_ key: String) -> String
-    public let separator: @Sendable () -> String
+    public let key: @Sendable (_ key: String) -> String
+    public let separator: @Sendable (_ key: String, _ value: String) -> [String]
+    public let value: @Sendable (_ value: String) -> String
 
-    public func format(key: String, value: String) -> String {
-        prefix() + body(key) + separator() + value
+    public func format(key: String, value: String) -> [String] {
+        separator(prefix() + self.key(key), self.value(value))
     }
 
-    func format(encoding: OptionEncoding) -> String {
+    func format(encoding: OptionEncoding) -> [String] {
         format(key: encoding.key, value: encoding.value)
     }
 
@@ -69,33 +70,39 @@ public struct OptionFormatter: Sendable {
     ///
     /// - Parameters
     ///   - prefix: Closure that returns the prefix string
-    ///   - body: Closure that transforms the key string for formatting
+    ///   - key: Closure that transforms the key string for formatting
     ///   - separator: Closure that returns the string that separates the key and value
+    ///   - value: Closure that transforms the value string for formatting
     public init(
         prefix: @escaping @Sendable () -> String,
-        body: @escaping @Sendable (_ key: String) -> String,
-        separator: @escaping @Sendable () -> String
+        key: @escaping @Sendable (_ key: String) -> String,
+        separator: @escaping @Sendable (_ key: String, _ value: String) -> [String],
+        value: @escaping @Sendable (_ value: String) -> String
     ) {
         self.prefix = prefix
-        self.body = body
+        self.key = key
         self.separator = separator
+        self.value = value
     }
 
     /// Initialize a new formatter
     ///
     /// - Parameters
     ///   - prefix: Name spaced closure that returns the prefix string for a Flag
-    ///   - body: Name spaced closure that transforms the key string for formatting
+    ///   - key: Name spaced closure that transforms the key string for formatting
     ///   - separator: Name spaced closure that returns the string that separates the key and value
+    ///   - value: Name spaced closure that transforms the value string for formatting
     public init(
         prefix: PrefixFormatter = .empty,
-        body: BodyFormatter = .empty,
-        separator: SeparatorFormatter = .space
+        key: KeyFormatter = .empty,
+        separator: SeparatorFormatter = .separate,
+        value: KeyFormatter = .empty
     ) {
         self.init(
             prefix: prefix.transform,
-            body: body.transform,
-            separator: separator.transform
+            key: key.transform,
+            separator: separator.transform,
+            value: value.transform
         )
     }
 }
@@ -116,7 +123,7 @@ public struct PrefixFormatter: Sendable {
 }
 
 /// Name space for a closure that transforms a Flag or Option's key
-public struct BodyFormatter: Sendable {
+public struct KeyFormatter: Sendable {
     public let transform: @Sendable (_ key: String) -> String
 
     public init(_ transform: @escaping @Sendable (_ key: String) -> String) {
@@ -126,18 +133,20 @@ public struct BodyFormatter: Sendable {
     public static let empty = Self { $0 }
     public static let kebabCase = Self(CaseConverter.kebabCase)
     public static let snakeCase = Self(CaseConverter.snakeCase)
+    public static let singleQuote = Self { "'\($0)'" }
 }
 
-/// Name space for a closure that returns the separator string between an Option's key and value
+/// Name space for a closure that returns the Option's key and value separated by a string or as separate elements in an
+/// array
 public struct SeparatorFormatter: Sendable {
-    public let transform: @Sendable () -> String
+    public let transform: @Sendable (_ key: String, _ value: String) -> [String]
 
-    public init(_ transform: @escaping @Sendable () -> String) {
+    public init(_ transform: @escaping @Sendable (_ key: String, _ value: String) -> [String]) {
         self.transform = transform
     }
 
-    public static let space = Self { StaticString.space.description }
-    public static let equal = Self { StaticString.equal.description }
+    public static let separate = Self { [$0, $1] }
+    public static let equal = Self { ["\($0)\(StaticString.equal.description)\($1)"] }
 }
 
 // MARK: Dependency
