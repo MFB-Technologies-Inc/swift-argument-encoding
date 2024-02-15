@@ -56,9 +56,10 @@ public struct OptionFormatter: Sendable {
     public let prefix: @Sendable () -> String
     public let body: @Sendable (_ key: String) -> String
     public let separator: @Sendable () -> String
+    public let value: @Sendable (_ value: String) -> String
 
     public func format(key: String, value: String) -> String {
-        prefix() + body(key) + separator() + value
+        prefix() + body(key) + separator() + self.value(value)
     }
 
     func format(encoding: OptionEncoding) -> String {
@@ -71,14 +72,17 @@ public struct OptionFormatter: Sendable {
     ///   - prefix: Closure that returns the prefix string
     ///   - body: Closure that transforms the key string for formatting
     ///   - separator: Closure that returns the string that separates the key and value
+    ///   - value: Closure that transforms the value string for formatting
     public init(
         prefix: @escaping @Sendable () -> String,
         body: @escaping @Sendable (_ key: String) -> String,
-        separator: @escaping @Sendable () -> String
+        separator: @escaping @Sendable () -> String,
+        value: @escaping @Sendable (_ value: String) -> String
     ) {
         self.prefix = prefix
         self.body = body
         self.separator = separator
+        self.value = value
     }
 
     /// Initialize a new formatter
@@ -87,15 +91,18 @@ public struct OptionFormatter: Sendable {
     ///   - prefix: Name spaced closure that returns the prefix string for a Flag
     ///   - body: Name spaced closure that transforms the key string for formatting
     ///   - separator: Name spaced closure that returns the string that separates the key and value
+    ///   - value: Name spaced closure that transforms the value string for formatting
     public init(
         prefix: PrefixFormatter = .empty,
         body: BodyFormatter = .empty,
-        separator: SeparatorFormatter = .space
+        separator: SeparatorFormatter = .space,
+        value: BodyFormatter = .empty
     ) {
         self.init(
             prefix: prefix.transform,
             body: body.transform,
-            separator: separator.transform
+            separator: separator.transform,
+            value: value.transform
         )
     }
 }
@@ -126,6 +133,7 @@ public struct BodyFormatter: Sendable {
     public static let empty = Self { $0 }
     public static let kebabCase = Self(CaseConverter.kebabCase)
     public static let snakeCase = Self(CaseConverter.snakeCase)
+    public static let singleQuote = Self { "'\($0)'" }
 }
 
 /// Name space for a closure that returns the separator string between an Option's key and value

@@ -87,4 +87,11 @@ final class FormatterTests: XCTestCase {
             "optionKey=optionValue"
         )
     }
+
+    func testOptionFormatterSingleQuoteValue() throws {
+        XCTAssertEqual(
+            OptionFormatter(value: .singleQuote).format(key: "optionKey", value: "optionValue"),
+            "optionKey 'optionValue'"
+        )
+    }
 }
