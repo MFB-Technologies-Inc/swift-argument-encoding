@@ -136,7 +136,8 @@ public struct KeyFormatter: Sendable {
     public static let singleQuote = Self { "'\($0)'" }
 }
 
-/// Name space for a closure that returns the Option's key and value separated by a string or as separate elements in an array
+/// Name space for a closure that returns the Option's key and value separated by a string or as separate elements in an
+/// array
 public struct SeparatorFormatter: Sendable {
     public let transform: @Sendable (_ key: String, _ value: String) -> [String]
 
