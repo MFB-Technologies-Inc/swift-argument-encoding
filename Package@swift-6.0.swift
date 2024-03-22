@@ -51,6 +51,6 @@ extension [SwiftSetting] {
         .enableUpcomingFeature("ForwardTrailingClosures"),
         .enableUpcomingFeature("ImportObjcForwardDeclarations"),
         .enableUpcomingFeature("InternalImportsByDefault"),
-        .enableExperimentalFeature("StrictConcurrency"),
+        .enableUpcomingFeature("StrictConcurrency"),
     ]
 }
