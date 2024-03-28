@@ -42,11 +42,14 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
 
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
-    private let unwrap: @Sendable (Value.Element) -> String?
+    @usableFromInline
+    let unwrap: @Sendable (Value.Element) -> String?
+    @usableFromInline
     var unwrapped: [String] {
         wrappedValue.compactMap(unwrap)
     }
 
+    @usableFromInline
     func encoding(key: String? = nil) -> OptionSetEncoding {
         guard let _key = keyOverride ?? key else {
             return OptionSetEncoding(values: [])
@@ -59,6 +62,7 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
     /// - Parameters
     ///     - key: OptionSetally provide a key value.
     /// - Returns: The argument encoding which is an array of strings
+    @inlinable
     public func arguments(key: String? = nil) -> [String] {
         encoding(key: key).arguments()
     }
@@ -69,6 +73,7 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
     ///     - unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(
         key: some CustomStringConvertible,
         value: Value,
@@ -85,6 +90,7 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
     ///     - wrappedValue: The underlying value
     ///     - _ key: OptionSetal explicit key value
     ///     - _ unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil, _ unwrap: @escaping @Sendable (Value.Element) -> String?) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -102,6 +108,7 @@ extension OptionSet: Equatable where Value: Equatable {
 }
 
 extension OptionSet: Hashable where Value: Hashable {
+    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(keyOverride)
         hasher.combine(unwrapped)
@@ -119,6 +126,7 @@ extension OptionSet where Value.Element: CustomStringConvertible {
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -130,6 +138,7 @@ extension OptionSet where Value.Element: CustomStringConvertible {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -148,6 +157,7 @@ extension OptionSet where Value.Element: RawRepresentable, Value.Element.RawValu
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -159,6 +169,7 @@ extension OptionSet where Value.Element: RawRepresentable, Value.Element.RawValu
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -179,6 +190,7 @@ extension OptionSet where Value.Element: CustomStringConvertible, Value.Element:
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -190,6 +202,7 @@ extension OptionSet where Value.Element: CustomStringConvertible, Value.Element:
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -205,6 +218,7 @@ extension OptionSet where Value.Element: CustomStringConvertible, Value.Element:
 // MARK: Coding
 
 extension OptionSet: DecodableWithConfiguration where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder, configuration: @escaping @Sendable (Value.Element) -> String?) throws {
         let container = try decoder.singleValueContainer()
         try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
@@ -212,6 +226,7 @@ extension OptionSet: DecodableWithConfiguration where Value: Decodable {
 }
 
 extension OptionSet: Decodable where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder) throws {
         guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey() else {
             throw DecodingError.dataCorrupted(DecodingError.Context(
@@ -244,6 +259,7 @@ extension OptionSet: Decodable where Value: Decodable {
 }
 
 extension OptionSet: Encodable where Value: Encodable {
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)
@@ -257,11 +273,13 @@ extension OptionSet: Encodable where Value: Encodable {
  initialized within a `withDependencies` closure so that the formatter is
  correctly injected.
  */
+@usableFromInline
 struct OptionSetEncoding {
     @Dependency(\.optionFormatter) var formatter
 
     let values: [OptionEncoding]
 
+    @usableFromInline
     func arguments() -> [String] {
         values.flatMap { formatter.format(encoding: $0) }
     }

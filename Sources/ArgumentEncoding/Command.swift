@@ -11,6 +11,7 @@ public struct Command: Hashable, Sendable, RawRepresentable {
     public let rawValue: String
 
     /// Accessor for `self` encoded as an array of argument strings - `[self.rawValue]`
+    @inlinable
     public func arguments() -> [String] {
         guard !rawValue.isEmpty else {
             return []
@@ -18,6 +19,7 @@ public struct Command: Hashable, Sendable, RawRepresentable {
         return [rawValue]
     }
 
+    @inlinable
     public init(rawValue: String) {
         self.rawValue = rawValue
     }
@@ -25,12 +27,14 @@ public struct Command: Hashable, Sendable, RawRepresentable {
 
 // ExpressibleBy...Literal conformances
 extension Command: ExpressibleByStringLiteral {
+    @inlinable
     public init(stringLiteral value: StringLiteralType) {
         self.init(rawValue: value)
     }
 }
 
 extension Command: ExpressibleByStringInterpolation {
+    @inlinable
     public init(stringInterpolation: DefaultStringInterpolation) {
         self.init(rawValue: stringInterpolation.description)
     }

@@ -28,17 +28,21 @@ public struct Positional<Value>: PositionalProtocol {
 
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
-    private let unwrap: @Sendable (Value) -> [String]
+    @usableFromInline
+    let unwrap: @Sendable (Value) -> [String]
+    @usableFromInline
     var unwrapped: [String] {
         unwrap(wrappedValue)
     }
 
+    @usableFromInline
     func encoding() -> [Command] {
         unwrapped.map(Command.init(rawValue:))
     }
 
     /// Get the Positional's argument encoding.
     /// - Returns: The argument encoding which is an array of strings
+    @inlinable
     public func arguments() -> [String] {
         encoding().flatMap { $0.arguments() }
     }
@@ -48,6 +52,7 @@ public struct Positional<Value>: PositionalProtocol {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(value: Value, unwrap: @escaping @Sendable (Value) -> [String]) {
         wrappedValue = value
         self.unwrap = unwrap
@@ -58,6 +63,7 @@ public struct Positional<Value>: PositionalProtocol {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(wrappedValue: Value, _ unwrap: @escaping @Sendable (Value) -> [String]) {
         self.wrappedValue = wrappedValue
         self.unwrap = unwrap
@@ -73,6 +79,7 @@ extension Positional: Equatable where Value: Equatable {
 }
 
 extension Positional: Hashable where Value: Hashable {
+    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(unwrapped)
         hasher.combine(ObjectIdentifier(Self.self))
@@ -88,6 +95,7 @@ extension Positional where Value: CustomStringConvertible {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(value: Value) {
         wrappedValue = value
         unwrap = Self.unwrap(_:)
@@ -97,6 +105,7 @@ extension Positional where Value: CustomStringConvertible {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(wrappedValue: Value) {
         self.wrappedValue = wrappedValue
         unwrap = Self.unwrap(_:)
@@ -113,6 +122,7 @@ extension Positional where Value: RawRepresentable, Value.RawValue: CustomString
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(value: Value) {
         wrappedValue = value
         unwrap = Self.unwrap(_:)
@@ -122,6 +132,7 @@ extension Positional where Value: RawRepresentable, Value.RawValue: CustomString
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(wrappedValue: Value) {
         self.wrappedValue = wrappedValue
         unwrap = Self.unwrap(_:)
@@ -140,6 +151,7 @@ extension Positional where Value: CustomStringConvertible, Value: RawRepresentab
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(value: Value) {
         wrappedValue = value
         unwrap = Self.unwrap(_:)
@@ -149,6 +161,7 @@ extension Positional where Value: CustomStringConvertible, Value: RawRepresentab
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(wrappedValue: Value) {
         self.wrappedValue = wrappedValue
         unwrap = Self.unwrap(_:)
@@ -167,6 +180,7 @@ extension Positional {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init<Wrapped>(value: Wrapped?) where Wrapped: CustomStringConvertible,
         Value == Wrapped?
     {
@@ -178,6 +192,7 @@ extension Positional {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init<Wrapped>(wrappedValue: Wrapped?) where Wrapped: CustomStringConvertible,
         Value == Wrapped?
     {
@@ -200,6 +215,7 @@ extension Positional {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init<E>(values: Value) where Value: Sequence, Value.Element == E,
         E: CustomStringConvertible
     {
@@ -211,6 +227,7 @@ extension Positional {
     ///
     /// - Parameters
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init<E>(wrappedValue: Value) where Value: Sequence, Value.Element == E,
         E: CustomStringConvertible
     {
@@ -229,6 +246,7 @@ extension Positional {
 // MARK: ExpressibleBy...Literal conformances
 
 extension Positional: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.IntegerLiteralType == Int {
+    @inlinable
     public init(integerLiteral value: IntegerLiteralType) {
         self.init(wrappedValue: Value(integerLiteral: value)) { [$0.description] }
     }
@@ -236,6 +254,7 @@ extension Positional: ExpressibleByIntegerLiteral where Value: BinaryInteger, Va
 
 #if os(macOS)
     extension Positional: ExpressibleByFloatLiteral where Value: BinaryFloatingPoint {
+        @inlinable
         public init(floatLiteral value: FloatLiteralType) {
             self.init(wrappedValue: Value(value)) { [$0.formatted()] }
         }
@@ -243,30 +262,35 @@ extension Positional: ExpressibleByIntegerLiteral where Value: BinaryInteger, Va
 #endif
 
 extension Positional: ExpressibleByExtendedGraphemeClusterLiteral where Value: StringProtocol {
+    @inlinable
     public init(extendedGraphemeClusterLiteral value: String) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Positional: ExpressibleByUnicodeScalarLiteral where Value: StringProtocol {
+    @inlinable
     public init(unicodeScalarLiteral value: String) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Positional: ExpressibleByStringLiteral where Value: StringProtocol {
+    @inlinable
     public init(stringLiteral value: StringLiteralType) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Positional: ExpressibleByStringInterpolation where Value: StringProtocol {
+    @inlinable
     public init(stringInterpolation: DefaultStringInterpolation) {
         self.init(wrappedValue: Value(stringInterpolation: stringInterpolation))
     }
 }
 
 extension Positional: DecodableWithConfiguration where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder, configuration: @escaping @Sendable (Value) -> [String]) throws {
         let container = try decoder.singleValueContainer()
         try self.init(wrappedValue: container.decode(Value.self), configuration)
@@ -276,6 +300,7 @@ extension Positional: DecodableWithConfiguration where Value: Decodable {
 // MARK: Coding
 
 extension Positional: Decodable where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey(for: Value.Type.self) else {
@@ -309,6 +334,7 @@ extension Positional: Decodable where Value: Decodable {
 }
 
 extension Positional: Encodable where Value: Encodable {
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)

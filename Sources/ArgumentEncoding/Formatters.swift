@@ -16,6 +16,7 @@ public struct FlagFormatter: Sendable {
     public let key: @Sendable (_ key: String) -> String
 
     @Sendable
+    @inlinable
     public func format(key: String) -> String {
         prefix() + self.key(key)
     }
@@ -30,6 +31,7 @@ public struct FlagFormatter: Sendable {
     /// - Parameters
     ///   - prefix: Closure that returns the prefix string
     ///   - key: Closure that transforms the key string for formatting
+    @inlinable
     public init(
         prefix: @escaping @Sendable () -> String,
         key: @escaping @Sendable (_ key: String) -> String
@@ -43,6 +45,7 @@ public struct FlagFormatter: Sendable {
     /// - Parameters
     ///   - prefix: Name spaced closure that returns the prefix string for a Flag
     ///   - key: Name spaced closure that transforms the key string for formatting
+    @inlinable
     public init(prefix: PrefixFormatter = .empty, key: KeyFormatter = .empty) {
         self.init(
             prefix: prefix.transform,
@@ -58,6 +61,7 @@ public struct OptionFormatter: Sendable {
     public let separator: @Sendable (_ key: String, _ value: String) -> [String]
     public let value: @Sendable (_ value: String) -> String
 
+    @inlinable
     public func format(key: String, value: String) -> [String] {
         separator(prefix() + self.key(key), self.value(value))
     }
@@ -73,6 +77,7 @@ public struct OptionFormatter: Sendable {
     ///   - key: Closure that transforms the key string for formatting
     ///   - separator: Closure that returns the string that separates the key and value
     ///   - value: Closure that transforms the value string for formatting
+    @inlinable
     public init(
         prefix: @escaping @Sendable () -> String,
         key: @escaping @Sendable (_ key: String) -> String,
@@ -92,6 +97,7 @@ public struct OptionFormatter: Sendable {
     ///   - key: Name spaced closure that transforms the key string for formatting
     ///   - separator: Name spaced closure that returns the string that separates the key and value
     ///   - value: Name spaced closure that transforms the value string for formatting
+    @inlinable
     public init(
         prefix: PrefixFormatter = .empty,
         key: KeyFormatter = .empty,
@@ -113,6 +119,7 @@ public struct OptionFormatter: Sendable {
 public struct PrefixFormatter: Sendable {
     public let transform: @Sendable () -> String
 
+    @inlinable
     public init(_ transform: @escaping @Sendable () -> String) {
         self.transform = transform
     }
@@ -126,6 +133,7 @@ public struct PrefixFormatter: Sendable {
 public struct KeyFormatter: Sendable {
     public let transform: @Sendable (_ key: String) -> String
 
+    @inlinable
     public init(_ transform: @escaping @Sendable (_ key: String) -> String) {
         self.transform = transform
     }
@@ -141,6 +149,7 @@ public struct KeyFormatter: Sendable {
 public struct SeparatorFormatter: Sendable {
     public let transform: @Sendable (_ key: String, _ value: String) -> [String]
 
+    @inlinable
     public init(_ transform: @escaping @Sendable (_ key: String, _ value: String) -> [String]) {
         self.transform = transform
     }
@@ -156,6 +165,7 @@ extension FlagFormatter: TestDependencyKey {
 }
 
 extension DependencyValues {
+    @inlinable
     public var flagFormatter: FlagFormatter {
         get { self[FlagFormatter.self] }
         set { self[FlagFormatter.self] = newValue }
@@ -171,6 +181,7 @@ extension OptionFormatter: TestDependencyKey {
 }
 
 extension DependencyValues {
+    @inlinable
     public var optionFormatter: OptionFormatter {
         get { self[OptionFormatter.self] }
         set { self[OptionFormatter.self] = newValue }

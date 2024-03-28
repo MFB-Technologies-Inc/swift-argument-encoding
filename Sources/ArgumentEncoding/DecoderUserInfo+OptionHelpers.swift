@@ -25,6 +25,7 @@ import Foundation
 /// // decoded = ["--option", "value"]
 /// ```
 extension [CodingUserInfoKey: Any] {
+    @inlinable
     public mutating func addOptionConfiguration<T>(
         for _: T.Type,
         configuration: @escaping Option<T>.DecodingConfiguration
@@ -35,6 +36,7 @@ extension [CodingUserInfoKey: Any] {
         self[key] = configuration
     }
 
+    @inlinable
     public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable,
         T: CustomStringConvertible
     {
@@ -42,6 +44,7 @@ extension [CodingUserInfoKey: Any] {
         addOptionConfiguration(for: T.self, configuration: Option<T?>.unwrap(_:))
     }
 
+    @inlinable
     public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: RawRepresentable,
         T.RawValue: CustomStringConvertible
     {
@@ -49,6 +52,7 @@ extension [CodingUserInfoKey: Any] {
         addOptionConfiguration(for: T.self, configuration: { $0.rawValue.description })
     }
 
+    @inlinable
     public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: CustomStringConvertible,
         T: RawRepresentable, T.RawValue: CustomStringConvertible
     {

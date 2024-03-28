@@ -49,6 +49,7 @@ extension CommandRepresentable {
     ///   - command: Explicit command value to prefix all child arguments
     /// - Returns
     ///   - Array of string arguments
+    @inlinable
     public func arguments(command: Command) -> [String] {
         command.arguments() + childArguments()
     }

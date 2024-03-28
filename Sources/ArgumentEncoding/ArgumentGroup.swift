@@ -55,10 +55,12 @@ public protocol ArgumentGroup {
 
 extension ArgumentGroup {
     /// Default implementation that uses reflection via the `Mirror` API to encode child arguments.
+    @inlinable
     public func arguments() -> [String] {
         childArguments()
     }
 
+    @usableFromInline
     func childArguments() -> [String] {
         applyFormatters(subject: self, operation: {
             let mirror = Mirror(reflecting: self)

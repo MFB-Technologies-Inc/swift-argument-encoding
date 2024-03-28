@@ -39,10 +39,12 @@ public struct Flag: Sendable, Hashable {
     public var wrappedValue: Bool
 
     /// Is the flag enabled or disabled? If disabled, it will be omitted from the arguments output.
+    @inlinable
     public var enabled: Bool {
         wrappedValue
     }
 
+    @usableFromInline
     func encoding(key: String? = nil) -> FlagEncoding? {
         guard let _key = keyOverride ?? key, enabled else {
             return nil
@@ -56,6 +58,7 @@ public struct Flag: Sendable, Hashable {
     /// - Parameters
     ///     - key: Optionally provide a key value.
     /// - Returns: The argument encoding which is an array of strings
+    @inlinable
     public func arguments(key: String? = nil) -> [String] {
         guard enabled, let encoding = encoding(key: key) else {
             return []
@@ -68,6 +71,7 @@ public struct Flag: Sendable, Hashable {
     /// - Parameters
     ///     - wrappedValue: The underlying enabled/disabled value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Bool, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -78,6 +82,7 @@ public struct Flag: Sendable, Hashable {
     /// - Parameters
     ///     - _ key: Optional explicit key value
     ///     - enabled: The underlying enabled/disabled value
+    @inlinable
     public init(_ key: some CustomStringConvertible, enabled: Bool = true) {
         keyOverride = key.description
         wrappedValue = enabled
@@ -87,6 +92,7 @@ public struct Flag: Sendable, Hashable {
 // MARK: ExpressibleByBooleanLiteral conformance
 
 extension Flag: ExpressibleByBooleanLiteral {
+    @inlinable
     public init(booleanLiteral value: BooleanLiteralType) {
         self.init(wrappedValue: value)
     }
@@ -95,6 +101,7 @@ extension Flag: ExpressibleByBooleanLiteral {
 // MARK: Decodable Conformance
 
 extension Flag: Decodable {
+    @inlinable
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         try self.init(wrappedValue: container.decode(Bool.self))
@@ -104,6 +111,7 @@ extension Flag: Decodable {
 // MARK: Encodable Conformance
 
 extension Flag: Encodable {
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)
@@ -117,11 +125,13 @@ extension Flag: Encodable {
  initialized within a `withDependencies` closure so that the formatter is
  correctly injected.
  */
+@usableFromInline
 struct FlagEncoding {
     @Dependency(\.flagFormatter) var formatter
 
     let key: String
 
+    @usableFromInline
     func argument() -> String {
         formatter._format(encoding: self)
     }

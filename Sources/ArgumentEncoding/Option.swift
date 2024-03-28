@@ -40,11 +40,14 @@ public struct Option<Value>: OptionProtocol {
 
     // Different Value types will encode to arguments differently.
     // Using unwrap, this can be handled individually per type or collectively by protocol
-    private let unwrap: @Sendable (Value) -> String?
+    @usableFromInline
+    let unwrap: @Sendable (Value) -> String?
+    @usableFromInline
     var unwrapped: String? {
         unwrap(wrappedValue)
     }
 
+    @usableFromInline
     func encoding(key: String? = nil) -> OptionEncoding? {
         guard let _key = keyOverride ?? key else {
             return nil
@@ -60,6 +63,7 @@ public struct Option<Value>: OptionProtocol {
     /// - Parameters
     ///     - key: Optionally provide a key value.
     /// - Returns: The argument encoding which is an array of strings
+    @inlinable
     public func arguments(key: String? = nil) -> [String] {
         encoding(key: key)?.arguments() ?? []
     }
@@ -70,6 +74,7 @@ public struct Option<Value>: OptionProtocol {
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
     ///     - unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value, unwrap: @escaping @Sendable (Value) -> String?) {
         keyOverride = key.description
         wrappedValue = value
@@ -82,6 +87,7 @@ public struct Option<Value>: OptionProtocol {
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
     ///     - _ unwrap: A closure for mapping a Value to [String]
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil, _ unwrap: @escaping @Sendable (Value) -> String?) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -99,6 +105,7 @@ extension Option: Equatable where Value: Equatable {
 }
 
 extension Option: Hashable where Value: Hashable {
+    @inlinable
     public func hash(into hasher: inout Hasher) {
         hasher.combine(keyOverride)
         hasher.combine(unwrapped)
@@ -116,6 +123,7 @@ extension Option where Value: CustomStringConvertible {
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -127,6 +135,7 @@ extension Option where Value: CustomStringConvertible {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -145,6 +154,7 @@ extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConv
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -156,6 +166,7 @@ extension Option where Value: RawRepresentable, Value.RawValue: CustomStringConv
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -176,6 +187,7 @@ extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init(key: some CustomStringConvertible, value: Value) {
         keyOverride = key.description
         wrappedValue = value
@@ -187,6 +199,7 @@ extension Option where Value: CustomStringConvertible, Value: RawRepresentable,
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init(wrappedValue: Value, _ key: String? = nil) {
         keyOverride = key
         self.wrappedValue = wrappedValue
@@ -207,6 +220,7 @@ extension Option {
     /// - Parameters
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
+    @inlinable
     public init<Wrapped>(key: some CustomStringConvertible, value: Wrapped?) where Wrapped: CustomStringConvertible,
         Value == Wrapped?
     {
@@ -220,6 +234,7 @@ extension Option {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
+    @inlinable
     public init<Wrapped>(wrappedValue: Wrapped?, _ key: String? = nil) where Wrapped: CustomStringConvertible,
         Value == Wrapped?
     {
@@ -239,6 +254,7 @@ extension Option {
 // MARK: ExpressibleBy...Literal conformances
 
 extension Option: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.IntegerLiteralType == Int {
+    @inlinable
     public init(integerLiteral value: IntegerLiteralType) {
         self.init(wrappedValue: Value(integerLiteral: value), nil) { $0.description }
     }
@@ -246,6 +262,7 @@ extension Option: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.
 
 #if os(macOS)
     extension Option: ExpressibleByFloatLiteral where Value: BinaryFloatingPoint {
+        @inlinable
         public init(floatLiteral value: FloatLiteralType) {
             self.init(wrappedValue: Value(value), nil) { $0.formatted() }
         }
@@ -253,24 +270,28 @@ extension Option: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.
 #endif
 
 extension Option: ExpressibleByExtendedGraphemeClusterLiteral where Value: StringProtocol {
+    @inlinable
     public init(extendedGraphemeClusterLiteral value: String) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Option: ExpressibleByUnicodeScalarLiteral where Value: StringProtocol {
+    @inlinable
     public init(unicodeScalarLiteral value: String) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Option: ExpressibleByStringLiteral where Value: StringProtocol {
+    @inlinable
     public init(stringLiteral value: StringLiteralType) {
         self.init(wrappedValue: Value(stringLiteral: value))
     }
 }
 
 extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
+    @inlinable
     public init(stringInterpolation: DefaultStringInterpolation) {
         self.init(wrappedValue: Value(stringInterpolation: stringInterpolation))
     }
@@ -279,6 +300,7 @@ extension Option: ExpressibleByStringInterpolation where Value: StringProtocol {
 // MARK: Coding
 
 extension Option: DecodableWithConfiguration where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder, configuration: @escaping @Sendable (Value) -> String?) throws {
         let container = try decoder.singleValueContainer()
         try self.init(wrappedValue: container.decode(Value.self), nil, configuration)
@@ -286,6 +308,7 @@ extension Option: DecodableWithConfiguration where Value: Decodable {
 }
 
 extension Option: Decodable where Value: Decodable {
+    @inlinable
     public init(from decoder: Decoder) throws {
         guard let configurationCodingUserInfoKey = Self.configurationCodingUserInfoKey() else {
             throw DecodingError.dataCorrupted(DecodingError.Context(
@@ -318,6 +341,7 @@ extension Option: Decodable where Value: Decodable {
 }
 
 extension Option: Encodable where Value: Encodable {
+    @inlinable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         try container.encode(wrappedValue)
@@ -331,12 +355,14 @@ extension Option: Encodable where Value: Encodable {
  initialized within a `withDependencies` closure so that the formatter is
  correctly injected.
  */
+@usableFromInline
 struct OptionEncoding {
     @Dependency(\.optionFormatter) var formatter
 
     let key: String
     let value: String
 
+    @usableFromInline
     func arguments() -> [String] {
         formatter.format(encoding: self)
     }
