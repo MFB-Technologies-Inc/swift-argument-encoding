@@ -4,11 +4,12 @@ import PackageDescription
 
 let package = Package(
     name: "swift-argument-encoding",
-    platforms: [.macOS(.v12)],
+    platforms: [.macOS(.v13)],
     products: [
         .library(name: "ArgumentEncoding", targets: ["ArgumentEncoding"]),
     ],
     dependencies: [
+        .benchmark,
         .dependencies,
     ],
     targets: [
@@ -26,8 +27,32 @@ let package = Package(
             ],
             swiftSettings: .swiftSix
         ),
+        .executableTarget(
+            name: "swift-argument-encoding-benchmark",
+            dependencies: [
+                "ArgumentEncoding",
+                .benchmark,
+            ],
+            path: "Benchmarks/swift-argument-encoding-benchmark",
+            plugins: [
+                .plugin(name: "BenchmarkPlugin", package: "package-benchmark"),
+            ]
+        ),
     ]
 )
+
+// MARK: Ordo One
+
+extension Package.Dependency {
+    static let benchmark: Package.Dependency = .package(
+        url: "https://github.com/ordo-one/package-benchmark.git",
+        from: "1.22.4"
+    )
+}
+
+extension Target.Dependency {
+    static let benchmark: Self = .product(name: "Benchmark", package: "package-benchmark")
+}
 
 // MARK: PointFree
 
