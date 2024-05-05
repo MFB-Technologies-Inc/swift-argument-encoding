@@ -11,14 +11,14 @@ import Benchmark
 import Foundation
 
 let benchmarks = {
-    Benchmark("Encode a really big argument set", configuration: .init(metrics: .all)) { _, command in
+    Benchmark("Encode an example argument set", configuration: .init(metrics: .all)) { _, command in
         blackHole(command.arguments())
     } setup: {
-        BigCommand.build(.init())
+        ExampleCommand.build(.init())
     }
 }
 
-enum BigCommand: TopLevelCommandRepresentable {
+enum ExampleCommand: TopLevelCommandRepresentable {
     case build(Build)
     case test(Test)
     case run(Run)
