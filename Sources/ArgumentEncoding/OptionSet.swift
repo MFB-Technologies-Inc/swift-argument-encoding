@@ -101,6 +101,7 @@ public struct OptionSet<Value>: OptionSetProtocol where Value: Sequence {
 // MARK: Conditional Conformances
 
 extension OptionSet: Equatable where Value: Equatable {
+    @inlinable
     public static func == (lhs: OptionSet<Value>, rhs: OptionSet<Value>) -> Bool {
         lhs.keyOverride == rhs.keyOverride
             && lhs.unwrapped == rhs.unwrapped
@@ -146,6 +147,7 @@ extension OptionSet where Value.Element: CustomStringConvertible {
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value.Element) -> String? {
         value.description
     }
@@ -177,6 +179,7 @@ extension OptionSet where Value.Element: RawRepresentable, Value.Element.RawValu
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value.Element) -> String? {
         value.rawValue.description
     }
@@ -210,6 +213,7 @@ extension OptionSet where Value.Element: CustomStringConvertible, Value.Element:
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value.Element) -> String? {
         value.rawValue.description
     }
@@ -253,6 +257,7 @@ extension OptionSet: Decodable where Value: Decodable {
         try self.init(from: decoder, configuration: configuration)
     }
 
+    @inlinable
     public static func configurationCodingUserInfoKey() -> CodingUserInfoKey? {
         CodingUserInfoKey(rawValue: "\(Self.self) - " + ObjectIdentifier(Self.self).debugDescription)
     }

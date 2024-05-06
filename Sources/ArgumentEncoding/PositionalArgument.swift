@@ -73,6 +73,7 @@ public struct Positional<Value>: PositionalProtocol {
 // MARK: Conditional Conformances
 
 extension Positional: Equatable where Value: Equatable {
+    @inlinable
     public static func == (lhs: Positional<Value>, rhs: Positional<Value>) -> Bool {
         lhs.unwrapped == rhs.unwrapped
     }
@@ -112,6 +113,7 @@ extension Positional where Value: CustomStringConvertible {
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value) -> [String] {
         [value.description]
     }
@@ -139,6 +141,7 @@ extension Positional where Value: RawRepresentable, Value.RawValue: CustomString
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value) -> [String] {
         [value.rawValue.description]
     }
@@ -168,6 +171,7 @@ extension Positional where Value: CustomStringConvertible, Value: RawRepresentab
     }
 
     @Sendable
+    @inlinable
     public static func unwrap(_ value: Value) -> [String] {
         [value.rawValue.description]
     }
@@ -201,6 +205,7 @@ extension Positional {
     }
 
     @Sendable
+    @inlinable
     public static func unwrap<Wrapped>(_ value: Wrapped?) -> [String] where Wrapped: CustomStringConvertible,
         Value == Wrapped?
     {
@@ -236,6 +241,7 @@ extension Positional {
     }
 
     @Sendable
+    @inlinable
     public static func unwrap<E>(_ value: Value) -> [String] where Value: Sequence, Value.Element == E,
         E: CustomStringConvertible
     {
@@ -328,6 +334,7 @@ extension Positional: Decodable where Value: Decodable {
         try self.init(wrappedValue: container.decode(Value.self), configuration)
     }
 
+    @inlinable
     public static func configurationCodingUserInfoKey(for _: (some Any).Type) -> CodingUserInfoKey? {
         CodingUserInfoKey(rawValue: ObjectIdentifier(Self.self).debugDescription)
     }
