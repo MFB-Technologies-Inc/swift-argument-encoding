@@ -9,13 +9,13 @@ let package = Package(
         .library(name: "ArgumentEncoding", targets: ["ArgumentEncoding"]),
     ],
     dependencies: [
-        .dependencies,
+        .dependencies(),
     ],
     targets: [
         .target(
             name: "ArgumentEncoding",
             dependencies: [
-                .dependencies,
+                .dependencies(),
             ],
             swiftSettings: .swiftSix
         ),
@@ -32,25 +32,22 @@ let package = Package(
 // MARK: PointFree
 
 extension Package.Dependency {
-    static let dependencies: Package.Dependency = .package(
-        url: "https://github.com/pointfreeco/swift-dependencies.git",
-        .upToNextMajor(from: "1.0.0")
-    )
+    static func dependencies() -> Package.Dependency {
+        .package(
+            url: "https://github.com/pointfreeco/swift-dependencies.git",
+            .upToNextMajor(from: "1.0.0")
+        )
+    }
 }
 
 extension Target.Dependency {
-    static let dependencies: Self = .product(name: "Dependencies", package: "swift-dependencies")
+    static func dependencies() -> Self {
+        .product(name: "Dependencies", package: "swift-dependencies")
+    }
 }
 
 extension [SwiftSetting] {
     static let swiftSix: Self = [
-        .enableUpcomingFeature("BareSlashRegexLiterals"),
-        .enableUpcomingFeature("ConciseMagicFile"),
-        .enableUpcomingFeature("DeprecateApplicationMain"),
-        .enableUpcomingFeature("DisableOutwardActorInference"),
-        .enableUpcomingFeature("ForwardTrailingClosures"),
-        .enableUpcomingFeature("ImportObjcForwardDeclarations"),
-        .enableUpcomingFeature("InternalImportsByDefault"),
         .enableExperimentalFeature("StrictConcurrency"),
     ]
 }

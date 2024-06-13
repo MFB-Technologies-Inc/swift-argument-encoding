@@ -250,14 +250,28 @@ final class ArgumentGroupTests: XCTestCase {
     }
 }
 
-extension Array: ArgumentGroup, FormatterNode {
-    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+#if swift(>=6)
+    extension Array: @retroactive ArgumentGroup, @retroactive FormatterNode {
+        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-}
+        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+    }
 
-extension Dictionary: ArgumentGroup, FormatterNode {
-    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+    extension Dictionary: @retroactive ArgumentGroup, @retroactive FormatterNode {
+        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-}
+        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+    }
+#else
+    extension Array: ArgumentGroup, FormatterNode {
+        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+
+        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+    }
+
+    extension Dictionary: ArgumentGroup, FormatterNode {
+        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+
+        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+    }
+#endif
