@@ -1,4 +1,4 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 6.0
 
 import PackageDescription
 
@@ -16,15 +16,13 @@ let package = Package(
             name: "ArgumentEncoding",
             dependencies: [
                 .dependencies(),
-            ],
-            swiftSettings: .swiftSix
+            ]
         ),
         .testTarget(
             name: "ArgumentEncodingTests",
             dependencies: [
                 "ArgumentEncoding",
-            ],
-            swiftSettings: .swiftSix
+            ]
         ),
     ]
 )
@@ -44,10 +42,4 @@ extension Target.Dependency {
     static func dependencies() -> Self {
         .product(name: "Dependencies", package: "swift-dependencies")
     }
-}
-
-extension [SwiftSetting] {
-    static let swiftSix: Self = [
-        .enableExperimentalFeature("StrictConcurrency"),
-    ]
 }
