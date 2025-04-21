@@ -1,9 +1,7 @@
 // ArgumentGroupTests.swift
 // ArgumentEncoding
 //
-// Copyright © 2024 MFB Technologies, Inc. All rights reserved.
-//
-// This source code is licensed under the MIT license found in the
+// This source code is licensed under the MIT License (MIT) found in the
 // LICENSE file in the root directory of this source tree.
 
 import ArgumentEncoding
@@ -250,28 +248,14 @@ final class ArgumentGroupTests: XCTestCase {
     }
 }
 
-#if swift(>=6)
-    extension Array: @retroactive ArgumentGroup, @retroactive FormatterNode {
-        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+extension Array: ArgumentGroup, FormatterNode {
+    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-    }
+    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+}
 
-    extension Dictionary: @retroactive ArgumentGroup, @retroactive FormatterNode {
-        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
+extension Dictionary: ArgumentGroup, FormatterNode {
+    public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
 
-        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-    }
-#else
-    extension Array: ArgumentGroup, FormatterNode {
-        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
-
-        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-    }
-
-    extension Dictionary: ArgumentGroup, FormatterNode {
-        public var flagFormatter: ArgumentEncoding.FlagFormatter { FlagFormatter(prefix: .doubleDash) }
-
-        public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
-    }
-#endif
+    public var optionFormatter: ArgumentEncoding.OptionFormatter { OptionFormatter(prefix: .doubleDash) }
+}
