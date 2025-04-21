@@ -224,6 +224,33 @@ extension Positional {
     }
 }
 
+// MARK: Convenience initializers when Value: ArgumentGroup
+
+extension Positional where Value: ArgumentGroup {
+    /// Initializes a new positional when not used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    public init(value: Value) {
+        wrappedValue = value
+        unwrap = Self.unwrap(_:)
+    }
+
+    /// Initializes a new positional when used as a `@propertyWrapper`
+    ///
+    /// - Parameters
+    ///     - wrappedValue: The underlying value
+    public init(wrappedValue: Value) {
+        self.wrappedValue = wrappedValue
+        unwrap = Self.unwrap(_:)
+    }
+
+    @Sendable
+    public static func unwrap(_ value: Value) -> [String] {
+        value.arguments()
+    }
+}
+
 // MARK: ExpressibleBy...Literal conformances
 
 extension Positional: ExpressibleByIntegerLiteral where Value: BinaryInteger, Value.IntegerLiteralType == Int {

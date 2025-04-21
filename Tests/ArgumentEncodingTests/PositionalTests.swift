@@ -26,6 +26,15 @@ final class PositionalTests: XCTestCase {
         let args = container.arguments()
         XCTAssertEqual(args, ["positional-argument"])
     }
+
+    func testPositionalArgumentGroup() throws {
+        let positional =
+            Positional(
+                value: Container(configuration: RawValueCustomStringConvertible(rawValue: "positional-argument"))
+            )
+        let args = positional.arguments()
+        XCTAssertEqual(args, ["positional-argument"])
+    }
 }
 
 private struct RawValueCustomStringConvertible: RawRepresentable, CustomStringConvertible {
