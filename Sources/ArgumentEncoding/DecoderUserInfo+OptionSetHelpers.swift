@@ -33,19 +33,19 @@ extension [CodingUserInfoKey: Any] {
         self[key] = configuration
     }
 
-    public mutating func addOptionSetConfiguration<T: Decodable & Sequence>(for _: T.Type)
+    public mutating func addOptionSetConfiguration<T: Decodable & Sequence & SendableMetatype>(for _: T.Type)
         where T.Element: CustomStringConvertible
     {
         addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
     }
 
-    public mutating func addOptionSetConfiguration<T: Decodable & Sequence>(for _: T.Type)
+    public mutating func addOptionSetConfiguration<T: Decodable & Sequence & SendableMetatype>(for _: T.Type)
         where T.Element: RawRepresentable, T.Element.RawValue: CustomStringConvertible
     {
         addOptionSetConfiguration(for: OptionSet<T>.self, configuration: OptionSet<T>.unwrap(_:))
     }
 
-    public mutating func addOptionSetConfiguration<T: Decodable & Sequence>(for _: T.Type)
+    public mutating func addOptionSetConfiguration<T: Decodable & Sequence & SendableMetatype>(for _: T.Type)
         where T.Element: CustomStringConvertible, T.Element: RawRepresentable,
         T.Element.RawValue: CustomStringConvertible
     {

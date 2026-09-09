@@ -21,7 +21,7 @@ import Foundation
 /// Container().arguments() == ["value"]
 /// ```
 @propertyWrapper
-public struct Positional<Value>: PositionalProtocol {
+public struct Positional<Value: SendableMetatype>: PositionalProtocol {
     public var wrappedValue: Value
 
     // Different Value types will encode to arguments differently.
@@ -166,7 +166,7 @@ extension Positional {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     public init<Wrapped>(value: Wrapped?) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
+        Value == Wrapped?, Wrapped: SendableMetatype
     {
         wrappedValue = value
         unwrap = Self.unwrap(_:)
@@ -177,7 +177,7 @@ extension Positional {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     public init<Wrapped>(wrappedValue: Wrapped?) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
+        Value == Wrapped?, Wrapped: SendableMetatype
     {
         self.wrappedValue = wrappedValue
         unwrap = Self.unwrap(_:)
@@ -197,7 +197,7 @@ extension Positional {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     public init<E>(values: Value) where Value: Sequence, Value.Element == E,
-        E: CustomStringConvertible
+        E: CustomStringConvertible, E: SendableMetatype
     {
         wrappedValue = values
         unwrap = Self.unwrap(_:)
@@ -208,7 +208,7 @@ extension Positional {
     /// - Parameters
     ///     - wrappedValue: The underlying value
     public init<E>(wrappedValue: Value) where Value: Sequence, Value.Element == E,
-        E: CustomStringConvertible
+        E: CustomStringConvertible, E: SendableMetatype
     {
         self.wrappedValue = wrappedValue
         unwrap = Self.unwrap(_:)

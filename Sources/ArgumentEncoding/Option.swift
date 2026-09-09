@@ -31,7 +31,7 @@ import Foundation
 /// Container().arguments() == ["--name", "value"]
 /// ```
 @propertyWrapper
-public struct Option<Value>: OptionProtocol {
+public struct Option<Value: SendableMetatype>: OptionProtocol {
     /// Explicitly specify the key value
     public let keyOverride: String?
     public var wrappedValue: Value
@@ -206,7 +206,7 @@ extension Option {
     ///     - key: Explicit key value
     ///     - wrappedValue: The underlying value
     public init<Wrapped>(key: some CustomStringConvertible, value: Wrapped?) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
+        Value == Wrapped?, Wrapped: SendableMetatype
     {
         keyOverride = key.description
         wrappedValue = value
@@ -219,7 +219,7 @@ extension Option {
     ///     - wrappedValue: The underlying value
     ///     - _ key: Optional explicit key value
     public init<Wrapped>(wrappedValue: Wrapped?, _ key: String? = nil) where Wrapped: CustomStringConvertible,
-        Value == Wrapped?
+        Value == Wrapped?, Wrapped: SendableMetatype
     {
         keyOverride = key
         self.wrappedValue = wrappedValue

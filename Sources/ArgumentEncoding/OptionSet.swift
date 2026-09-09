@@ -33,7 +33,7 @@ import Foundation
 /// OptionSetContainer().arguments() == ["--name", "value1", "--name", "value2"]
 /// ```
 @propertyWrapper
-public struct OptionSet<Value: Sequence>: OptionSetProtocol {
+public struct OptionSet<Value: Sequence & SendableMetatype>: OptionSetProtocol {
     /// Explicitly specify the key value
     public let keyOverride: String?
     public var wrappedValue: Value
