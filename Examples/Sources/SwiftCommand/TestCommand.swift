@@ -7,8 +7,8 @@
 import ArgumentEncoding
 
 struct TestCommand: CommandRepresentable {
-    let flagFormatter: FlagFormatter = .doubleDashPrefixKebabCase
-    let optionFormatter: OptionFormatter = .doubleDashPrefixKebabCase
+    let flagFormatter: FlagFormatter = .init(prefix: .doubleDash, key: .kebabCase)
+    let optionFormatter: OptionFormatter = .init(prefix: .doubleDash, key: .kebabCase)
 
     @Flag var parallel: Bool = true
     @Option var numWorkers: Int = 1
@@ -16,4 +16,4 @@ struct TestCommand: CommandRepresentable {
     var testProducts: [Command]
 }
 
-extension [Command]: ArgumentGroup {}
+extension [Command]: @retroactive ArgumentGroup {}
