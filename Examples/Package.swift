@@ -25,8 +25,8 @@ let package = Package(
 
 extension Package.Dependency {
     static func argumentEncoding() -> Package.Dependency {
-       .package(name: "swift-argument-encoding", path: "../")
-   }
+        .package(name: "swift-argument-encoding", path: "../")
+    }
 }
 
 extension Target.Dependency {
