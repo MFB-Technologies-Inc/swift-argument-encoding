@@ -1,4 +1,4 @@
-// swift-tools-version: 5.7
+// swift-tools-version: 6.3
 
 import PackageDescription
 
@@ -9,13 +9,13 @@ let package = Package(
         .executable(name: "SwiftCommand", targets: ["SwiftCommand"]),
     ],
     dependencies: [
-        .argumentEncoding,
+        .argumentEncoding(),
     ],
     targets: [
         .executableTarget(
             name: "SwiftCommand",
             dependencies: [
-                .argumentEncoding,
+                .argumentEncoding(),
             ]
         ),
     ]
@@ -24,9 +24,13 @@ let package = Package(
 // MARK: Local
 
 extension Package.Dependency {
-    static let argumentEncoding: Package.Dependency = .package(name: "swift-argument-encoding", path: "../")
+    static func argumentEncoding() -> Package.Dependency {
+       .package(name: "swift-argument-encoding", path: "../")
+   }
 }
 
 extension Target.Dependency {
-    static let argumentEncoding: Self = .product(name: "ArgumentEncoding", package: "swift-argument-encoding")
+    static func argumentEncoding() -> Self {
+        .product(name: "ArgumentEncoding", package: "swift-argument-encoding")
+    }
 }
