@@ -33,7 +33,8 @@ extension Package.Dependency {
     static func dependencies() -> Package.Dependency {
         .package(
             url: "https://github.com/pointfreeco/swift-dependencies.git",
-            .upToNextMajor(from: "1.0.0")
+            .upToNextMajor(from: "1.0.0"),
+            traits: []
         )
     }
 }
