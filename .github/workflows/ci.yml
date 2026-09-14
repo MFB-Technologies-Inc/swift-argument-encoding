@@ -14,7 +14,7 @@ jobs:
     runs-on: macos-latest
     environment: default
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: SwiftFormat version
         run: swiftformat --version
       - name: Format lint
@@ -29,12 +29,12 @@ jobs:
     runs-on: macos-latest
     environment: default
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Tests
         run: swift test --enable-code-coverage --parallel
       - name: Swift Coverage Report
         run: xcrun llvm-cov export -format="lcov" .build/debug/swift-argument-encodingPackageTests.xctest/Contents/MacOS/swift-argument-encodingPackageTests -instr-profile .build/debug/codecov/default.profdata > coverage_report.lcov
-      - uses: codecov/codecov-action@v5
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true # optional (default = false)
@@ -43,6 +43,6 @@ jobs:
     environment: default
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Run Tests
         run: swift test --parallel

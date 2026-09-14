@@ -5,7 +5,7 @@
 // LICENSE file in the root directory of this source tree.
 
 import Dependencies
-import XCTestDynamicOverlay
+import IssueReporting
 
 /// Formats `Flag`s to match how different executables format arguments
 public struct FlagFormatter: Sendable {
@@ -161,7 +161,7 @@ extension DependencyValues {
 }
 
 extension FlagFormatter {
-    public static let unimplemented: FlagFormatter = XCTestDynamicOverlay.unimplemented(placeholder: FlagFormatter())
+    public static let unimplemented: FlagFormatter = IssueReporting.unimplemented(placeholder: FlagFormatter())
 }
 
 extension OptionFormatter: TestDependencyKey {
@@ -176,6 +176,6 @@ extension DependencyValues {
 }
 
 extension OptionFormatter {
-    public static let unimplemented: OptionFormatter = XCTestDynamicOverlay
+    public static let unimplemented: OptionFormatter = IssueReporting
         .unimplemented(placeholder: OptionFormatter())
 }

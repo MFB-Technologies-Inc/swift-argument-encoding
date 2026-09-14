@@ -7,8 +7,8 @@
 import ArgumentEncoding
 
 struct RunCommand: CommandRepresentable {
-    let flagFormatter: FlagFormatter = .doubleDashPrefixKebabCase
-    let optionFormatter: OptionFormatter = .doubleDashPrefixKebabCase
+    let flagFormatter: FlagFormatter = .init(prefix: .doubleDash, key: .kebabCase)
+    let optionFormatter: OptionFormatter = .init(prefix: .doubleDash, key: .kebabCase)
 
     let executable: Command
 }

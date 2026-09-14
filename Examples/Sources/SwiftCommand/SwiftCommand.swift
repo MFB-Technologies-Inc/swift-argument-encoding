@@ -12,11 +12,11 @@ enum SwiftCommand: TopLevelCommandRepresentable {
     }
 
     var flagFormatter: FlagFormatter {
-        .doubleDashPrefixKebabCase
+        .init(prefix: .doubleDash, key: .kebabCase)
     }
 
     var optionFormatter: OptionFormatter {
-        .doubleDashPrefixKebabCase
+        .init(prefix: .doubleDash, key: .kebabCase)
     }
 
     case run(RunCommand)

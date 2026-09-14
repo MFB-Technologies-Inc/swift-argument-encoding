@@ -23,7 +23,7 @@ import Foundation
 /// // decoded = ["--option", "value"]
 /// ```
 extension [CodingUserInfoKey: Any] {
-    public mutating func addOptionConfiguration<T: Decodable>(
+    public mutating func addOptionConfiguration<T: Decodable & SendableMetatype>(
         for _: T.Type,
         configuration: @escaping Option<T>.DecodingConfiguration
     ) {
@@ -33,20 +33,22 @@ extension [CodingUserInfoKey: Any] {
         self[key] = configuration
     }
 
-    public mutating func addOptionConfiguration<T: Decodable & CustomStringConvertible>(for _: T.Type) {
+    public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable,
+        T: CustomStringConvertible, T: SendableMetatype
+    {
         addOptionConfiguration(for: T.self, configuration: Option<T>.unwrap(_:))
         addOptionConfiguration(for: T.self, configuration: Option<T?>.unwrap(_:))
     }
 
-    public mutating func addOptionConfiguration<T: Decodable & RawRepresentable>(for _: T.Type)
-        where T.RawValue: CustomStringConvertible
+    public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: RawRepresentable,
+        T.RawValue: CustomStringConvertible, T: SendableMetatype
     {
         addOptionConfiguration(for: T.self, configuration: Option<T>.unwrap(_:))
         addOptionConfiguration(for: T.self, configuration: { $0.rawValue.description })
     }
 
     public mutating func addOptionConfiguration<T>(for _: T.Type) where T: Decodable, T: CustomStringConvertible,
-        T: RawRepresentable, T.RawValue: CustomStringConvertible
+        T: RawRepresentable, T.RawValue: CustomStringConvertible, T: SendableMetatype
     {
         addOptionConfiguration(for: T.self, configuration: Option<T>.unwrap(_:))
         addOptionConfiguration(for: T.self, configuration: Option<T?>.unwrap(_:))
